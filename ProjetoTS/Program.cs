@@ -18,6 +18,7 @@ namespace ProjetoTS
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Login());
             Application.Run(new InBox());
+            Application.Run(new Chat());
         }
     }
 }

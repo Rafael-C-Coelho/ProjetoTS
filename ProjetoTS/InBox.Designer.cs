@@ -36,6 +36,7 @@
             // 
             // btnNewChat
             // 
+            this.btnNewChat.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnNewChat.Location = new System.Drawing.Point(23, 12);
             this.btnNewChat.Name = "btnNewChat";
             this.btnNewChat.Size = new System.Drawing.Size(93, 34);
@@ -61,7 +62,7 @@
             this.richTextBox1.ForeColor = System.Drawing.SystemColors.MenuText;
             this.richTextBox1.Location = new System.Drawing.Point(249, 62);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(205, 228);
+            this.richTextBox1.Size = new System.Drawing.Size(205, 224);
             this.richTextBox1.TabIndex = 2;
             this.richTextBox1.Text = "";
             // 

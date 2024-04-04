@@ -86,19 +86,19 @@
             // txtBoxUsername
             // 
             this.txtBoxUsername.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxUsername.Location = new System.Drawing.Point(98, 25);
+            this.txtBoxUsername.Location = new System.Drawing.Point(105, 25);
             this.txtBoxUsername.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtBoxUsername.Name = "txtBoxUsername";
-            this.txtBoxUsername.Size = new System.Drawing.Size(376, 22);
+            this.txtBoxUsername.Size = new System.Drawing.Size(369, 22);
             this.txtBoxUsername.TabIndex = 4;
             // 
             // textBox1
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(98, 65);
+            this.textBox1.Location = new System.Drawing.Point(105, 65);
             this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(376, 22);
+            this.textBox1.Size = new System.Drawing.Size(369, 22);
             this.textBox1.TabIndex = 5;
             // 
             // Login
