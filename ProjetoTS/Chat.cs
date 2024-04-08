@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace ProjetoTS
 {
-    public partial class Login : Form
+    public partial class Chat : Form
     {
-        public Login()
+        public Chat()
         {
             InitializeComponent();
         }

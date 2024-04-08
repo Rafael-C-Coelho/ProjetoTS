@@ -10,11 +10,13 @@ using System.Windows.Forms;
 
 namespace ProjetoTS
 {
-    public partial class Login : Form
+    public partial class InBox : Form
     {
-        public Login()
+        public InBox()
         {
             InitializeComponent();
         }
+
+       
     }
 }
