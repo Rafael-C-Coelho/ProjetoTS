@@ -90,6 +90,32 @@ namespace Server
             }
         }
 
+        public string GetUserPublicKey(string username)
+        {
+            string publicKey = "";
+            string connectionString = GetConnectionString();
+            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                        SELECT `public_key` FROM `users`
+                        WHERE `username` = @username;
+                    ";
+                    command.Parameters.AddWithValue("@username", username);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            publicKey = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+            return publicKey;
+        }
+
         private int GetUserId(string username)
         {
             int id = -1;
@@ -212,7 +238,7 @@ namespace Server
                     {
                         while (reader.Read())
                         {
-                            messages.Add($"{reader.GetString(0)},{GetUsername(reader.GetString(1))}"));
+                            messages.Add($"{reader.GetString(0)},{GetUsername(int.Parse(reader.GetString(1)))}");
                         }
                     }
                 }

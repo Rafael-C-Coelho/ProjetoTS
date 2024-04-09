@@ -17,25 +17,9 @@ namespace Server
     {
         public enum Type
         {
-            ACK = 1,
-            HANDSHAKE_REQ,
-            HANDSHAKE_RES,
-            SERVER_PUBLIC_KEY,
-            CLIENT_PUBLIC_KEY,
-            AES_KEY,
-            BYTES,
-            REPEAT,
-            EOT,
-            SOT,
-            FTS,
-            FTE,
-            FILE_NAME,
-            FILE_SIZE,
+            SERVER_PUBLIC_KEY = 1,
             PING,
             PONG,
-            CHECKSUM,
-            RELAY,
-            BROADCAST,
             LOGIN,
             LOGIN_ERROR,
             LOGIN_SUCCESS,
@@ -44,7 +28,9 @@ namespace Server
             REGISTER_ERROR,
             REGISTER_SUCCESS,
             LIST_USERS,
+            LIST_USERS_ERROR,
             LIST_MESSAGES,
+            LIST_MESSAGES_ERROR,
             SEND_MESSAGE,
             SEND_MESSAGE_ERROR,
             SEND_MESSAGE_SUCCESS,
@@ -54,6 +40,13 @@ namespace Server
     class ChatServer : ProtoServer
     {
         private static Random random = new Random();
+        private RSAParameters serverPrivateKey;
+        private string ServerPrivateKeyPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "ProjetoTS",
+            "server_private.key"
+        ).ToString();
+
         public static string GenerateAuthtoken()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -61,68 +54,27 @@ namespace Server
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        private RSAParameters serverPrivateKey;
-        private RSAParameters clientPublicKey;
-
-        private const string ServerPrivateKeyPath = "server_private.key";
-        private const string ClientPublicKeyPath = "client_public.key";
-
         public ChatServer()
         {
             // Load server's private key or generate a new one if not exists
             if (File.Exists(ServerPrivateKeyPath))
             {
+                Console.WriteLine($"Loading the RSA keys at {ServerPrivateKeyPath}...");
                 serverPrivateKey = LoadRSAParameters(ServerPrivateKeyPath);
             }
             else
             {
+                if (!Directory.Exists(Path.GetDirectoryName(ServerPrivateKeyPath)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(ServerPrivateKeyPath));
+
                 using (RSA rsa = RSA.Create())
                 {
+                    Console.WriteLine($"Creating the RSA keys at {ServerPrivateKeyPath}...");
                     serverPrivateKey = rsa.ExportParameters(true);
                     SaveRSAParameters(serverPrivateKey, ServerPrivateKeyPath);
                 }
             }
-        }
-
-        private RSAParameters DeserializePublicKey(byte[] publicKeyBytes)
-        {
-            using (MemoryStream stream = new MemoryStream(publicKeyBytes))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    int modulusLength = reader.ReadInt32();
-                    byte[] modulus = reader.ReadBytes(modulusLength);
-                    int exponentLength = reader.ReadInt32();
-                    byte[] exponent = reader.ReadBytes(exponentLength);
-
-                    RSAParameters publicKey = new RSAParameters
-                    {
-                        Modulus = modulus,
-                        Exponent = exponent
-                    };
-
-                    return publicKey;
-                }
-            }
-        }
-
-        private byte[] GenerateAESKey()
-        {
-            // Generate a new AES key
-            using (Aes aes = Aes.Create())
-            {
-                aes.GenerateKey();
-                return aes.Key;
-            }
-        }
-
-        private byte[] EncryptAESKey(byte[] aesKey, RSAParameters publicKey)
-        {
-            using (RSA rsa = RSA.Create())
-            {
-                rsa.ImportParameters(publicKey);
-                return rsa.Encrypt(aesKey, RSAEncryptionPadding.OaepSHA256);
-            }
+            Console.WriteLine("Finished");
         }
 
         private void SaveRSAParameters(RSAParameters parameters, string filePath)
@@ -204,16 +156,21 @@ namespace Server
             return Convert.ToHexString(hashBytes);
         }
 
+        private string DecryptMessage(Packet receivedPacket)
+        {
+            byte[] encryptedData = receivedPacket.GetDataAs<byte[]>();
+            byte[] decryptedData = DecryptData(encryptedData, serverPrivateKey);
+            string message = Encoding.UTF8.GetString(decryptedData);
+            return message;
+        }
+
         public override void OnRequest(int userID)
         {
             Packet receivedPacket = AssembleReceivedDataIntoPacket(userID);
             
             if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER)
             {
-                byte[] encryptedData = receivedPacket.GetDataAs<byte[]>();
-                byte[] decryptedData = DecryptData(encryptedData, serverPrivateKey);
-                string message = Encoding.UTF8.GetString(decryptedData);
-
+                string message = DecryptMessage(receivedPacket);
                 string[] parts = message.Split(':');
                 string username = parts[0];
                 string password = parts[1];
@@ -234,10 +191,7 @@ namespace Server
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN)
             {
                 // Decrypt login data with server's private key
-                byte[] encryptedData = receivedPacket.GetDataAs<byte[]>();
-                byte[] decryptedData = DecryptData(encryptedData, serverPrivateKey);
-                string message = Encoding.UTF8.GetString(decryptedData);
-
+                string message = DecryptMessage(receivedPacket);
                 string[] parts = message.Split(':');
                 string username = parts[0];
                 string password = parts[1];
@@ -262,8 +216,7 @@ namespace Server
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGOUT)
             {
-                byte[] data = receivedPacket.GetDataAs<byte[]>();
-                string message = Encoding.UTF8.GetString(data);
+                string message = DecryptMessage(receivedPacket);
                 string[] parts = message.Split(':');
                 string username = parts[0];
                 string authtoken = parts[1];
@@ -282,10 +235,8 @@ namespace Server
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS)
             {
-                byte[] data = receivedPacket.GetDataAs<byte[]>();
-                string message = Encoding.UTF8.GetString(data);
+                string message = DecryptMessage(receivedPacket);
                 string[] parts = message.Split(':');
-                string username = parts[0];
                 string authtoken = parts[1];
                 DBHelper dbhelper = new DBHelper();
                 try
@@ -297,14 +248,13 @@ namespace Server
                     Send(Packet.Serialize(packet), userID);
                 } catch (Exception e)
                 {
-                    Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS);
+                    Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS_ERROR);
                     packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
                     Send(Packet.Serialize(packet), userID);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_MESSAGES)
             {
-                byte[] data = receivedPacket.GetDataAs<byte[]>();
-                string message = Encoding.UTF8.GetString(data);
+                string message = DecryptMessage(receivedPacket);
                 string[] parts = message.Split(':');
                 string username = parts[0];
                 string authtoken = parts[1];
@@ -328,10 +278,13 @@ namespace Server
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SERVER_PUBLIC_KEY)
             {
                 // Send server's public key to the client
+                Console.WriteLine("Sending the Server's Public Key");
                 byte[] serverPublicKeyBytes = SerializePublicKey(serverPrivateKey);
+                Console.WriteLine($"{serverPublicKeyBytes}");
                 Packet serverPublicKeyPacket = new Packet((int)ChatPacket.Type.SERVER_PUBLIC_KEY);
                 serverPublicKeyPacket.SetPayload(serverPublicKeyBytes);
                 Send(Packet.Serialize(serverPublicKeyPacket), userID);
+                Console.WriteLine("Server's public key sent.");
             }
         }
     }
