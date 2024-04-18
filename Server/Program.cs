@@ -58,13 +58,15 @@ namespace Server
         ).ToString();
         private AES aesKey;
         private byte[] aesIV;
+        public Logger logger;
 
         public ChatServer()
         {
+            logger = new Logger("server_logs.log");
             // Load server's private key or generate a new one if not exists
             if (File.Exists(ServerPrivateKeyPath))
             {
-                Console.WriteLine($"Loading the RSA keys at {ServerPrivateKeyPath}...");
+                logger.Info($"Loading the RSA keys at {ServerPrivateKeyPath}...");
                 serverPrivateKey = LoadRSAParameters(ServerPrivateKeyPath, true);
 
                 using (RSA rsa = RSA.Create())
@@ -76,15 +78,21 @@ namespace Server
             else
             {
                 if (!Directory.Exists(Path.GetDirectoryName(ServerPrivateKeyPath)))
+                {
+                    logger.Info($"Creating the directory for the RSA keys at {ServerPrivateKeyPath}...");
                     Directory.CreateDirectory(Path.GetDirectoryName(ServerPrivateKeyPath));
-
+                    logger.Info("Directory created.");
+                }                
+                
                 using (RSA rsa = RSA.Create())
                 {
+                    logger.Info($"Creating the RSA keys at {ServerPrivateKeyPath}...");
                     rsa.KeySize = 1024;
                     Console.WriteLine($"Creating the RSA keys at {ServerPrivateKeyPath}...");
                     serverPrivateKey = rsa.ExportParameters(true);
                     serverPublicKey = rsa.ExportParameters(false);
                     SaveRSAParameters(serverPrivateKey, ServerPrivateKeyPath);
+                    logger.Info("RSA keys created and saved.");
                 }
             }
             Console.WriteLine("Finished");
