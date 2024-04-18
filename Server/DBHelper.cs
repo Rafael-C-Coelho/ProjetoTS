@@ -10,6 +10,11 @@ namespace Server
 {
     internal class DBHelper
     {
+        public DBHelper()
+        {
+            CreateDatabase();
+        }
+
         public static string GetConnectionString()
         {
             return Path.Combine(
@@ -31,38 +36,30 @@ namespace Server
                     using (SQLiteCommand command = new SQLiteCommand(connection))
                     {
                         command.CommandText = @"
-                            CREATE TABLE IF NOT EXISTS `users`(
-                                `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                                `username` VARCHAR(255) NOT NULL,
-                                `password` VARCHAR(255) NOT NULL,
-                                `public_key` VARCHAR(255) NOT NULL
+                            CREATE TABLE IF NOT EXISTS users (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                username TEXT NOT NULL UNIQUE,
+                                password TEXT NOT NULL,
+                                public_key TEXT NOT NULL
                             );
-                            CREATE TABLE IF NOT EXISTS `messages`(
-                                `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                                `message` BIGINT NOT NULL,
-                                `sender` BIGINT NOT NULL,
-                                `recipient` BIGINT NOT NULL,
-                                `sent_at` TIMESTAMP NOT NULL
+
+                            CREATE TABLE IF NOT EXISTS messages (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                message TEXT NOT NULL,
+                                sender INTEGER NOT NULL,
+                                recipient INTEGER NOT NULL,
+                                sent_at TIMESTAMP NOT NULL,
+                                FOREIGN KEY (sender) REFERENCES users(id),
+                                FOREIGN KEY (recipient) REFERENCES users(id)
                             );
-                            CREATE TABLE IF NOT EXISTS `token`(
-                                `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                                `token` VARCHAR(255) NOT NULL,
-                                `user` BIGINT UNSIGNED NOT NULL
+
+                            CREATE TABLE IF NOT EXISTS token (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                token TEXT NOT NULL,
+                                user INTEGER NOT NULL,
+                                UNIQUE (token),
+                                FOREIGN KEY (user) REFERENCES users(id)
                             );
-                            ALTER TABLE
-                                `messages` ADD INDEX `messages_sender_index`(`sender`);
-                            ALTER TABLE
-                                `messages` ADD INDEX `messages_recipient_index`(`recipient`);
-                            ALTER TABLE
-                                `token` ADD UNIQUE `token_token_unique`(`token`);
-                            ALTER TABLE
-                                `token` ADD CONSTRAINT `token_user_foreign` FOREIGN KEY(`user`) REFERENCES `users`(`id`);
-                            ALTER TABLE
-                                `messages` ADD CONSTRAINT `messages_recipient_foreign` FOREIGN KEY(`recipient`) REFERENCES `users`(`id`);
-                            ALTER TABLE
-                                `token` ADD CONSTRAINT `token_user_foreign` FOREIGN KEY(`user`) REFERENCES `users`(`id`);
-                            ALTER TABLE
-                                `messages` ADD CONSTRAINT `messages_sender_foreign` FOREIGN KEY(`sender`) REFERENCES `users`(`id`);
                         ";
                         command.ExecuteNonQuery();
                     }
@@ -114,6 +111,32 @@ namespace Server
                 }
             }
             return publicKey;
+        }
+
+        public string GetUserAESKey(string username)
+        {
+            string aesKey = "";
+            string connectionString = GetConnectionString();
+            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                        SELECT `aes_key` FROM `users`
+                        WHERE `username` = @username;
+                    ";
+                    command.Parameters.AddWithValue("@username", username);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            aesKey = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+            return aesKey;
         }
 
         private int GetUserId(string username)
@@ -172,7 +195,6 @@ namespace Server
         {
             string publicKey = "";
             string connectionString = GetConnectionString();
-            int username_id = GetUserId(username);
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
                 connection.Open();
@@ -182,7 +204,7 @@ namespace Server
                         SELECT `public_key` FROM `users`
                         WHERE `username` = @username;
                     ";
-                    command.Parameters.AddWithValue("@username", username_id);
+                    command.Parameters.AddWithValue("@username", username);
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
@@ -230,7 +252,7 @@ namespace Server
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
                     command.CommandText = @"
-                        SELECT `message`, `sender` FROM `messages`
+                        SELECT `sender`, `message` FROM `messages`
                         WHERE `recipient` = @recipient;
                     ";
                     command.Parameters.AddWithValue("@recipient", recipient_id);
@@ -238,7 +260,7 @@ namespace Server
                     {
                         while (reader.Read())
                         {
-                            messages.Add($"{reader.GetString(0)},{GetUsername(int.Parse(reader.GetString(1)))}");
+                            messages.Add($"{GetUsername(reader.GetInt32(0))},{reader.GetString(1)}");
                         }
                     }
                 }
@@ -286,32 +308,6 @@ namespace Server
             }
         }
 
-        public string GetToken(string token)
-        {
-            string user = "";
-            string connectionString = GetConnectionString();
-            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
-            {
-                connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand(connection))
-                {
-                    command.CommandText = @"
-                        SELECT `user` FROM `token`
-                        WHERE `token` = @token;
-                    ";
-                    command.Parameters.AddWithValue("@token", token);
-                    using (SQLiteDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            user = GetUsername(int.Parse(reader.GetString(0)));
-                        }
-                    }
-                }
-            }
-            return user;
-        }
-
         public void DeleteToken(string token)
         {
             string connectionString = GetConnectionString();
@@ -343,7 +339,7 @@ namespace Server
                         SELECT `id` FROM `users`
                         WHERE `username` = @username AND `password` = @password;
                     ";
-                    command.Parameters.AddWithValue("@username", GetUserId(username));
+                    command.Parameters.AddWithValue("@username", username);
                     command.Parameters.AddWithValue("@password", password);
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
@@ -375,7 +371,7 @@ namespace Server
                     {
                         if (reader.Read())
                         {
-                            user = GetUsername(int.Parse(reader.GetString(0)));
+                            user = GetUsername(reader.GetInt32(0));
                         }
                     }
                 }
@@ -385,6 +381,11 @@ namespace Server
                 throw new Exception("Invalid token");
             }
             return user;
+        }
+
+        internal void InsertMessage(string username, string messageContent)
+        {
+            throw new NotImplementedException();
         }
     }
 }
