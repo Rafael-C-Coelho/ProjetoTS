@@ -12,6 +12,10 @@ namespace Server
 
         public Logger(string logFilename)
         {
+            if (!Directory.Exists(Path.GetDirectoryName(GetPathString(logFilename))))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(GetPathString(logFilename)));
+            }
             this.logFilePath = GetPathString(logFilename);
         }
 

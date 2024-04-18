@@ -421,8 +421,15 @@ namespace Server
         {
             DBHelper dbHelper = new DBHelper();
             ChatServer server = new ChatServer();
-            Thread serverThread = new Thread(() => server.Start(PORT));
-            serverThread.Start();
+            try
+            {
+                Thread serverThread = new Thread(() => server.Start(PORT));
+                serverThread.Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }
