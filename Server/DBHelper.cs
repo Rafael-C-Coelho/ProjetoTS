@@ -26,6 +26,9 @@ namespace Server
 
         public static void CreateDatabase()
         {
+            if (!Directory.Exists(Directory.GetParent(GetConnectionString()).ToString()))
+                Directory.CreateDirectory(Directory.GetParent(GetConnectionString()).ToString());
+
             string connectionString = GetConnectionString();
             if (!File.Exists(connectionString))
             {
