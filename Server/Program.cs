@@ -104,8 +104,7 @@ namespace Server
         public static string GenerateAuthtoken(string username)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            string auth = new string(Enumerable.Repeat(chars, 16)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
+            string auth = new string(Enumerable.Repeat(chars, 16).Select(s => s[random.Next(s.Length)]).ToArray());
             DBHelper dBHelper = new DBHelper();
             dBHelper.InsertToken(auth, username);
             return auth;
@@ -119,10 +118,16 @@ namespace Server
                 {
                     return new byte[0];
                 }
+
+                logger.Info("Decrypting message with AES...");
+
                 rsa.ImportParameters(serverPrivateKey);
                 byte[] aesKeyData = rsa.Decrypt(data.Take(rsa.KeySize / 8).ToArray(), false);
                 aesKey = new AES(aesKeyData);
                 byte[] bytes = data.Skip(rsa.KeySize / 8).ToArray();
+
+                logger.Info("Message decrypted successfully.");
+
                 return aesKey.Decrypt(bytes);
             }
         }

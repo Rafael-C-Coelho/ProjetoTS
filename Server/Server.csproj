@@ -8,13 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="protoip">
-      <HintPath>Z:\TS\protoip.dll</HintPath>
-    </Reference>
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
+    <Reference Include="protoip">
+      <HintPath>..\..\..\..\..\Downloads\protoip.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
