@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Entity.Core.Common.CommandTrees;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
@@ -15,14 +16,18 @@ namespace ProjetoTS
 {
     public partial class Chat : Form
     {
-        public Chat()
+        public string username;
+        private DBHelper dbhelper = new DBHelper();
+
+        public Chat(string username)
         {
             InitializeComponent();
+            this.username = username;
         }
 
         private void Chat_Load(object sender, EventArgs e)
         {
-            ChatClient client = new ChatClient(this);
+            ChatClient client = new ChatClient(this, this.username);
             Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS);
             packet.SetPayload(client.EncryptMessageWithAES(client.authtoken));
             client.Send(Packet.Serialize(packet));
@@ -40,7 +45,7 @@ namespace ProjetoTS
 
         private void btnSend_Click(object sender, EventArgs e)
         {
-            ChatClient client = new ChatClient(this);
+            ChatClient client = new ChatClient(this, this.username);
             Packet packet = new Packet((int)ChatPacket.Type.SEND_USER_PUBLIC_KEY);
             packet.SetPayload(client.EncryptMessageWithAES(client.authtoken + ":" + cBxTo.Text));
             client.Send(Packet.Serialize(packet));
@@ -64,9 +69,11 @@ namespace ProjetoTS
         protected Chat form;
         public string ToUserPublicKey;
 
-        public ChatClient(Chat form) : base()
+        public ChatClient(Chat form, string username) : base()
         {
             this.form = form;
+            base.LoadClientKeys(username);
+            base.authtoken = LoadAuthToken(username);
         }
 
         public override void OnReceive()
@@ -78,11 +85,15 @@ namespace ProjetoTS
                 string message = receivedPacket.GetDataAs<string>();
                 List<string> users = message.Split(',').ToList();
                 form.AddUsersToDropDown(users);
-            } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_ERROR)
+                Disconnect();
+            }
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_ERROR)
             {
                 MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
                 form.Close();
-            } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_SUCCESS)
+                Disconnect();
+            }
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_SUCCESS)
             {
                 ToUserPublicKey = Encoding.UTF8.GetString(DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
                 Packet packet = new Packet((int)ChatPacket.Type.SEND_MESSAGE);
@@ -93,14 +104,18 @@ namespace ProjetoTS
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_ERROR)
             {
                 MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
+                Disconnect();
             }
             else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE_SUCCESS)
             {
                 MessageBox.Show("Message sent successfully.");
                 form.Close();
-            } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE_ERROR)
+                Disconnect();
+            }
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE_ERROR)
             {
                 MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
+                Disconnect();
             }
         }
     }

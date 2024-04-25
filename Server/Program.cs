@@ -43,6 +43,9 @@ namespace Server
             SEND_MESSAGE,
             SEND_MESSAGE_ERROR,
             SEND_MESSAGE_SUCCESS,
+            DELETE_USER,
+            DELETE_USER_ERROR,
+            DELETE_USER_SUCCESS,
         }
     }
 
@@ -251,6 +254,7 @@ namespace Server
         public override void OnRequest(int userID)
         {
             Packet receivedPacket = AssembleReceivedDataIntoPacket(userID);
+            Console.WriteLine("Requested by " + userID + " " + receivedPacket._GetType());
             DBHelper dbhelper = new DBHelper();
 
             if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER)
@@ -406,10 +410,28 @@ namespace Server
                 Console.WriteLine("Server's public key sent.");
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.AES_KEY)
             {
-                // Decrypt AES key and IV with server's private key
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 aesKey = new AES(DecryptDataWithRSA(Convert.FromBase64String(parts[0])));
+            }
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.DELETE_USER)
+            {
+                string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
+                string[] parts = message.Split(':');
+                string authtoken = parts[0];
+                try
+                {
+                    string username = dbhelper.GetUserFromToken(authtoken);
+                    dbhelper.DeleteUser(username);
+                    Packet packet = new Packet((int)ChatPacket.Type.DELETE_USER_SUCCESS);
+                    Send(Packet.Serialize(packet), userID);
+                }
+                catch (Exception e)
+                {
+                    Packet packet = new Packet((int)ChatPacket.Type.DELETE_USER_ERROR);
+                    packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
+                    Send(Packet.Serialize(packet), userID);
+                }
             }
         }
     }

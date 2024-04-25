@@ -34,10 +34,13 @@
             this.txtBoxMessages = new System.Windows.Forms.RichTextBox();
             this.lblMessage = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.Settings = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetKeysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Settings.SuspendLayout();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.destruirUtilizadorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.timerFetchMessages = new System.Windows.Forms.Timer(this.components);
+            this.refreshMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnNewChat
@@ -102,40 +105,69 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "Lista de mensagens";
             // 
-            // Settings
+            // menuStrip1
             // 
-            this.Settings.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem1,
-            this.resetKeysToolStripMenuItem});
-            this.Settings.Name = "contextMenuStrip1";
-            this.Settings.Size = new System.Drawing.Size(181, 70);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.settingsToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(358, 24);
+            this.menuStrip1.TabIndex = 5;
+            this.menuStrip1.Text = "menuStrip1";
             // 
-            // toolStripMenuItem1
+            // settingsToolStripMenuItem
             // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItem1.Text = "Logout";
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshMessagesToolStripMenuItem,
+            this.destruirUtilizadorToolStripMenuItem,
+            this.logoutToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.settingsToolStripMenuItem.Text = "Options";
             // 
-            // resetKeysToolStripMenuItem
+            // destruirUtilizadorToolStripMenuItem
             // 
-            this.resetKeysToolStripMenuItem.Name = "resetKeysToolStripMenuItem";
-            this.resetKeysToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.resetKeysToolStripMenuItem.Text = "Reset keys";
+            this.destruirUtilizadorToolStripMenuItem.Name = "destruirUtilizadorToolStripMenuItem";
+            this.destruirUtilizadorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.destruirUtilizadorToolStripMenuItem.Text = "Destroy user";
+            this.destruirUtilizadorToolStripMenuItem.Click += new System.EventHandler(this.destruirUtilizadorToolStripMenuItem_Click);
+            // 
+            // logoutToolStripMenuItem
+            // 
+            this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
+            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.logoutToolStripMenuItem.Text = "Logout";
+            // 
+            // timerFetchMessages
+            // 
+            this.timerFetchMessages.Enabled = true;
+            this.timerFetchMessages.Interval = 10000;
+            // this.timerFetchMessages.Tick += new System.EventHandler(this.timerFetchMessages_Tick);
+            // 
+            // refreshMessagesToolStripMenuItem
+            // 
+            this.refreshMessagesToolStripMenuItem.Name = "refreshMessagesToolStripMenuItem";
+            this.refreshMessagesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.refreshMessagesToolStripMenuItem.Text = "Refresh messages";
+            this.refreshMessagesToolStripMenuItem.Click += new System.EventHandler(this.refreshMessagesToolStripMenuItem_Click);
             // 
             // InBox
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(358, 280);
+            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.txtBoxMessages);
             this.Controls.Add(this.listBoxMessages);
             this.Controls.Add(this.btnNewChat);
+            this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "InBox";
             this.Text = "InBox";
-            this.Settings.ResumeLayout(false);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -148,8 +180,11 @@
         private System.Windows.Forms.RichTextBox txtBoxMessages;
         private System.Windows.Forms.Label lblMessage;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ContextMenuStrip Settings;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem resetKeysToolStripMenuItem;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem destruirUtilizadorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem logoutToolStripMenuItem;
+        private System.Windows.Forms.Timer timerFetchMessages;
+        private System.Windows.Forms.ToolStripMenuItem refreshMessagesToolStripMenuItem;
     }
 }

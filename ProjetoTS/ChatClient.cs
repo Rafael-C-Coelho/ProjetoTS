@@ -41,11 +41,15 @@ namespace ProjetoTS
             SEND_MESSAGE,
             SEND_MESSAGE_ERROR,
             SEND_MESSAGE_SUCCESS,
+            DELETE_USER,
+            DELETE_USER_ERROR,
+            DELETE_USER_SUCCESS,
         }
     }
 
     class Client : ProtoClient
     {
+        public DBHelper dbhelper;
         public RSAParameters serverPublicKey;
         public RSAParameters clientPublicKey;
         public RSAParameters clientPrivateKey;
@@ -58,55 +62,43 @@ namespace ProjetoTS
         {
             string IP = "127.0.0.1";
             int PORT = 1111;
-            for (int i = 0; i < 10; i++)
+            dbhelper = new DBHelper();
+            try
             {
-                try
-                {
-                    this.Connect(IP, PORT);
-                    break;
-                } catch (Exception e)
-                {
-                    MessageBox.Show(e.Message);
-                }
+                this.Connect(IP, PORT);
+            } catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
             }
             Console.WriteLine("Starting to load the private/public keys needed.");
-            authtoken = LoadAuthTokenFromFile();
-            LoadClientKeys();
             LoadServerKey();
             aesKey = new AES();
             aesKey.GenerateKey();
             Console.WriteLine("Successfully loaded the private/public keys needed.");
         }
 
-        public void LoadClientKeys()
+        public void LoadClientKeys(string username)
         {
-            if (Directory.Exists(GetPathString("")) == false)
+            using (RSA rSA = RSA.Create())
             {
-                Directory.CreateDirectory(GetPathString(""));
+                clientPrivateKeyString = dbhelper.GetPrivateKey(username);
+                rSA.FromXmlString(clientPrivateKeyString);
+                clientPrivateKey = rSA.ExportParameters(true);
+                clientPublicKeyString = dbhelper.GetPublicKey(username);
+                rSA.FromXmlString(clientPublicKeyString);
+                clientPublicKey = rSA.ExportParameters(false);
             }
+        }
 
-            if (File.Exists(GetPathString("private.key")) && File.Exists(GetPathString("public.key")))
+        public void CreateClientKeys(string username)
+        {
+            using (RSA rSA = RSA.Create())
             {
-                using (RSA rSA = RSA.Create())
-                {
-                    rSA.FromXmlString(File.ReadAllText(GetPathString("private.key")));
-                    clientPrivateKey = rSA.ExportParameters(true);
-                    clientPrivateKeyString = rSA.ToXmlString(true);
-                    rSA.FromXmlString(File.ReadAllText(GetPathString("public.key")));
-                    clientPublicKey = rSA.ExportParameters(false);
-                    clientPublicKeyString = rSA.ToXmlString(false);
-                }
-            } else
-            {
-                using (RSA rSA = RSA.Create())
-                {
-                    rSA.KeySize = 1024;
-                    clientPrivateKey = rSA.ExportParameters(true);
-                    clientPublicKey = rSA.ExportParameters(false);
-                    clientPublicKeyString = rSA.ToXmlString(false);
-                    File.WriteAllText(GetPathString("private.key"), rSA.ToXmlString(true));
-                    File.WriteAllText(GetPathString("public.key"), rSA.ToXmlString(false));
-                }
+                clientPrivateKey = rSA.ExportParameters(true);
+                clientPublicKey = rSA.ExportParameters(false);
+                clientPrivateKeyString = rSA.ToXmlString(true);
+                clientPublicKeyString = rSA.ToXmlString(false);
+                dbhelper.InsertUser(username, clientPrivateKeyString, clientPublicKeyString, "");
             }
         }
 
@@ -180,8 +172,12 @@ namespace ProjetoTS
             }
         }
 
-        public static string GetPathString(string filename)
+        public string GetPathString(string filename)
         {
+            if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ProjetoTS")))
+            {
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ProjetoTS"));
+            }
             return Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "ProjetoTS",
@@ -189,25 +185,9 @@ namespace ProjetoTS
             );
         }
 
-        protected void SaveAuthTokenToFile(string authtoken)
+        protected string LoadAuthToken(string username)
         {
-            using (StreamWriter sw = new StreamWriter(GetPathString("authtoken.key")))
-            {
-                sw.Write(authtoken);
-            }
-        }
-
-        protected string LoadAuthTokenFromFile()
-        {
-            string authtoken = "";
-            if (File.Exists(GetPathString("authtoken.key")))
-            {
-                using (StreamReader sr = new StreamReader(GetPathString("authtoken.key")))
-                {
-                    authtoken = sr.ReadToEnd();
-                }
-            }
-            return authtoken;
+            return dbhelper.GetAuthToken(username);
         }
 
         protected RSAParameters DeserializePublicKey(string publicKeyXml)

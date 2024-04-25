@@ -16,6 +16,8 @@ namespace ProjetoTS
         [STAThread]
         static void Main()
         {
+            Random random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             Setup();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -28,6 +30,7 @@ namespace ProjetoTS
             Packet packet = new Packet((int)ChatPacket.Type.SERVER_PUBLIC_KEY);
             client.Send(Packet.Serialize(packet));
             client.Receive();
+            client.Disconnect();
         }
     }
 }

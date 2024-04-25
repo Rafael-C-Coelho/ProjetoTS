@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace ProjetoTS
 {
@@ -23,6 +24,7 @@ namespace ProjetoTS
         {
             LoginClient client = new LoginClient(this);
             Packet packet = new Packet((int)ChatPacket.Type.REGISTER);
+            client.CreateClientKeys(txtBoxUsername.Text);
             packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text + ":" + client.clientPublicKeyString));
             client.Send(Packet.Serialize(packet));
             client.Receive();
@@ -38,15 +40,22 @@ namespace ProjetoTS
             client.Receive();
             client.Disconnect();
         }
+
+        public string GetUsername()
+        {
+            return txtBoxUsername.Text;
+        }
     }
 
     class LoginClient : Client
     {
         private Login form;
+        private DBHelper dbhelper;
 
         public LoginClient(Login form) : base()
         {
             this.form = form;
+            dbhelper = new DBHelper();
         }
 
         public override void OnReceive()
@@ -64,24 +73,32 @@ namespace ProjetoTS
             else if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER_ERROR)
             {
                 MessageBox.Show("Error: " + receivedPacket.GetDataAs<string>());
+                Disconnect();
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER_SUCCESS)
             {
                 MessageBox.Show("Success");
-                this.SaveAuthTokenToFile(authtoken: receivedPacket.GetDataAs<string>());
-                InBox inBox = new InBox();
+                string username = this.form.GetUsername();
+                dbhelper.UpdateAuthToken(username, receivedPacket.GetDataAs<string>());
+                this.LoadClientKeys(username);
+                InBox inBox = new InBox(username);
                 inBox.Show();
                 this.form.Hide();
+                Disconnect();
             }
             else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN_ERROR)
             {
                 MessageBox.Show("Error: " + receivedPacket.GetDataAs<string>());
+                Disconnect();
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN_SUCCESS)
             {
                 MessageBox.Show("Success");
-                this.SaveAuthTokenToFile(authtoken: receivedPacket.GetDataAs<string>());
-                InBox inBox = new InBox();
+                string username = this.form.GetUsername();
+                this.LoadClientKeys(username);
+                dbhelper.UpdateAuthToken(username, receivedPacket.GetDataAs<string>());
+                InBox inBox = new InBox(username);
                 inBox.Show();
                 this.form.Hide();
+                Disconnect();
             }
         }
     }

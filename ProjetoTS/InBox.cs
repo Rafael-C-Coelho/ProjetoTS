@@ -1,4 +1,5 @@
 ﻿using ProtoIP;
+using Server;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace ProjetoTS
 {
@@ -17,9 +19,12 @@ namespace ProjetoTS
     {
         private InBoxClient client;
         private List<string> messages;
+        private Logger logger = new Logger("inbox.log");
+        private string username;
 
-        public InBox()
+        public InBox(string username)
         {
+            this.username = username;
             InitializeComponent();
             messages = new List<string>();
             FetchNewMessages();
@@ -27,22 +32,30 @@ namespace ProjetoTS
 
         private void FetchNewMessages()
         {
-            client = new InBoxClient(this);
+            client = new InBoxClient(this, this.username);
             Packet packet = new Packet((int)ChatPacket.Type.LIST_MESSAGES);
             packet.SetPayload(client.EncryptMessageWithAES(client.authtoken));
             client.Send(Packet.Serialize(packet));
             client.Receive();
+            client.Disconnect();
         }
 
         public void AddMessage(string username, string message)
         {
+            foreach (string messageStored in messages)
+            {
+                if (message == messageStored)
+                {
+                    return;
+                }
+            }
             listBoxMessages.Items.Add(username);
             messages.Add(message);
         }
 
         private void btnNewChat_Click(object sender, EventArgs e)
         {
-            Chat chat = new Chat();
+            Chat chat = new Chat(this.username);
             chat.Show();
         }
 
@@ -64,15 +77,42 @@ namespace ProjetoTS
                                     ),
                                     RSAEncryptionPadding.Pkcs1
                                 )
-                            ) + Environment.NewLine +
-                            "------------" + Environment.NewLine +
-                            "Encrypted:" + Environment.NewLine +
-                            messages[listBoxMessages.SelectedIndex];
+                            );
+                        logger.Info("Encrypted:" + messages[listBoxMessages.SelectedIndex]);
                     } catch (CryptographicException)
                     {
+                        logger.Error("Error: Could not decrypt message. Either the keys have changed or been deleted.");
                         txtBoxMessages.Text = "Error: Could not decrypt message. Either the keys have changed or been deleted.";
                     }
                 }
+            }
+        }
+
+        private void destruirUtilizadorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void timerFetchMessages_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                FetchNewMessages();
+            } catch (Exception ex)
+            {
+                logger.Error("Error: " + ex.Message);
+            }
+        }
+
+        private void refreshMessagesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                FetchNewMessages();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error: " + ex.Message);
             }
         }
     }
@@ -80,10 +120,13 @@ namespace ProjetoTS
     class InBoxClient : Client
     {
         private InBox form;
+        private DBHelper dbhelper = new DBHelper();
 
-        public InBoxClient(InBox form) : base()
+        public InBoxClient(InBox form, string username) : base()
         {
             this.form = form;
+            this.LoadClientKeys(username);
+            base.authtoken = dbhelper.GetAuthToken(username);
         }
 
         public override void OnReceive()
@@ -100,13 +143,15 @@ namespace ProjetoTS
             }
             else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_MESSAGES_ERROR)
             {
-                MessageBox.Show("Error: " + receivedPacket.GetDataAs<byte[]>());
+                MessageBox.Show("Error: " + receivedPacket.GetDataAs<string>());
+                Disconnect();
             }
             else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_MESSAGES_SUCCESS)
             {
                 string messages = Encoding.UTF8.GetString(DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
                 if (messages == "")
                 {
+                    Disconnect();
                     return;
                 }
                 List<string> messagesList = messages.Split(';').ToList();
@@ -117,6 +162,10 @@ namespace ProjetoTS
                     string messageContent = messageParts[1];
                     this.form.AddMessage(username, messageContent);
                 }
+                Disconnect();
+            } else
+            {
+                Disconnect(); return;
             }
         }
     }

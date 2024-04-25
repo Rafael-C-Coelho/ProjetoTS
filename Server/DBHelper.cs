@@ -27,6 +27,10 @@ namespace Server
         public static void CreateDatabase()
         {
             string connectionString = GetConnectionString();
+            if (!Directory.Exists(Path.GetDirectoryName(connectionString)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(connectionString));
+            }
             if (!File.Exists(connectionString))
             {
                 SQLiteConnection.CreateFile(connectionString);
@@ -56,6 +60,14 @@ namespace Server
                             CREATE TABLE IF NOT EXISTS token (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 token TEXT NOT NULL,
+                                user INTEGER NOT NULL,
+                                UNIQUE (token),
+                                FOREIGN KEY (user) REFERENCES users(id)
+                            );
+
+                            CREATE TABLE IF NOT EXISTS directory (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                dir_name INTEGER NOT NULL,
                                 user INTEGER NOT NULL,
                                 UNIQUE (token),
                                 FOREIGN KEY (user) REFERENCES users(id)
@@ -321,6 +333,44 @@ namespace Server
                         WHERE `token` = @token;
                     ";
                     command.Parameters.AddWithValue("@token", token);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteUser(string username)
+        {
+            int usernameID = GetUserId(username);
+            string connectionString = GetConnectionString();
+            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                        DELETE FROM `messages`
+                        WHERE `recipient` = @recipient OR `sender` = @sender;
+                    ";
+                    command.Parameters.AddWithValue("@recipient", usernameID);
+                    command.Parameters.AddWithValue("@sender", usernameID);
+                    command.ExecuteNonQuery();
+                }
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                        DELETE FROM `token`
+                        WHERE `user` = @user;
+                    ";
+                    command.Parameters.AddWithValue("@user", usernameID);
+                    command.ExecuteNonQuery();
+                }
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                        DELETE FROM `users`
+                        WHERE `username` = @username;
+                    ";
+                    command.Parameters.AddWithValue("@username", username);
                     command.ExecuteNonQuery();
                 }
             }

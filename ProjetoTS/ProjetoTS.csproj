@@ -76,6 +76,8 @@
       <DependentUpon>Chat.cs</DependentUpon>
     </Compile>
     <Compile Include="ChatClient.cs" />
+    <Compile Include="DBHelper.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Login.cs">
       <SubType>Form</SubType>
     </Compile>
