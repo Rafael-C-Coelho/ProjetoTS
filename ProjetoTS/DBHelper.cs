@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Server;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
@@ -63,22 +64,28 @@ namespace ProjetoTS
 
         public void InsertUser(string username, string privateKey, string publicKey, string authToken)
         {
-            string connectionString = GetConnectionString();
-            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            try
             {
-                connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand(connection))
+                string connectionString = GetConnectionString();
+                using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
                 {
-                    command.CommandText = @"
+                    connection.Open();
+                    using (SQLiteCommand command = new SQLiteCommand(connection))
+                    {
+                        command.CommandText = @"
                         INSERT INTO `users`(`username`, `privateKey`, `publicKey`, `authToken`)
                         VALUES(@username, @privateKey, @publicKey, @authToken);
                     ";
-                    command.Parameters.AddWithValue("@username", username);
-                    command.Parameters.AddWithValue("@privateKey", privateKey);
-                    command.Parameters.AddWithValue("@publicKey", publicKey);
-                    command.Parameters.AddWithValue("@authToken", authToken);
-                    command.ExecuteNonQuery();
+                        command.Parameters.AddWithValue("@username", username);
+                        command.Parameters.AddWithValue("@privateKey", privateKey);
+                        command.Parameters.AddWithValue("@publicKey", publicKey);
+                        command.Parameters.AddWithValue("@authToken", authToken);
+                        command.ExecuteNonQuery();
+                    }
                 }
+            } catch (Exception ex)
+            {
+                // ADD LOGGER HERE @Rafael Coelho
             }
         }
 
@@ -182,21 +189,27 @@ namespace ProjetoTS
 
         public void InsertMessage(string sender, string recipient, string content)
         {
-            string connectionString = GetConnectionString();
-            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            try
             {
-                connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand(connection))
+                string connectionString = GetConnectionString();
+                using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
                 {
-                    command.CommandText = @"
+                    connection.Open();
+                    using (SQLiteCommand command = new SQLiteCommand(connection))
+                    {
+                        command.CommandText = @"
                         INSERT INTO `messages`(`sender`, `recipient`, `content`)
                         VALUES(@sender, @recipient, @content);
                     ";
-                    command.Parameters.AddWithValue("@sender", sender);
-                    command.Parameters.AddWithValue("@recipient", recipient);
-                    command.Parameters.AddWithValue("@content", content);
-                    command.ExecuteNonQuery();
+                        command.Parameters.AddWithValue("@sender", sender);
+                        command.Parameters.AddWithValue("@recipient", recipient);
+                        command.Parameters.AddWithValue("@content", content);
+                        command.ExecuteNonQuery();
+                    }
                 }
+            } catch (Exception ex)
+            {
+                // ADD LOGGER HERE @Rafael Coelho
             }
         }
 

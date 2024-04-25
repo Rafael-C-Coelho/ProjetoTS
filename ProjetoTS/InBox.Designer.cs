@@ -36,10 +36,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.destruirUtilizadorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timerFetchMessages = new System.Windows.Forms.Timer(this.components);
-            this.refreshMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -125,31 +125,31 @@
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Options";
             // 
+            // refreshMessagesToolStripMenuItem
+            // 
+            this.refreshMessagesToolStripMenuItem.Name = "refreshMessagesToolStripMenuItem";
+            this.refreshMessagesToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.refreshMessagesToolStripMenuItem.Text = "Refresh messages";
+            this.refreshMessagesToolStripMenuItem.Click += new System.EventHandler(this.refreshMessagesToolStripMenuItem_Click);
+            // 
             // destruirUtilizadorToolStripMenuItem
             // 
             this.destruirUtilizadorToolStripMenuItem.Name = "destruirUtilizadorToolStripMenuItem";
-            this.destruirUtilizadorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.destruirUtilizadorToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.destruirUtilizadorToolStripMenuItem.Text = "Destroy user";
             this.destruirUtilizadorToolStripMenuItem.Click += new System.EventHandler(this.destruirUtilizadorToolStripMenuItem_Click);
             // 
             // logoutToolStripMenuItem
             // 
             this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
-            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.logoutToolStripMenuItem.Text = "Logout";
             // 
             // timerFetchMessages
             // 
             this.timerFetchMessages.Enabled = true;
-            this.timerFetchMessages.Interval = 10000;
-            // this.timerFetchMessages.Tick += new System.EventHandler(this.timerFetchMessages_Tick);
-            // 
-            // refreshMessagesToolStripMenuItem
-            // 
-            this.refreshMessagesToolStripMenuItem.Name = "refreshMessagesToolStripMenuItem";
-            this.refreshMessagesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.refreshMessagesToolStripMenuItem.Text = "Refresh messages";
-            this.refreshMessagesToolStripMenuItem.Click += new System.EventHandler(this.refreshMessagesToolStripMenuItem_Click);
+            this.timerFetchMessages.Interval = 5000;
+            this.timerFetchMessages.Tick += new System.EventHandler(this.timerFetchMessages_Tick);
             // 
             // InBox
             // 
