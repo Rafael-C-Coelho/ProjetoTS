@@ -73,7 +73,14 @@ namespace Server
                                 FOREIGN KEY (user) REFERENCES users(id)
                             );
                         ";
-                        command.ExecuteNonQuery();
+                        try
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                        catch (Exception e)
+                        {
+                            CreateDatabase();
+                        }
                     }
                 }
             }
