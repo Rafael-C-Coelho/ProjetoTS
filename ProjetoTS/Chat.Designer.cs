@@ -39,10 +39,11 @@
             // lblTo
             // 
             this.lblTo.AutoSize = true;
-            this.lblTo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTo.ForeColor = System.Drawing.Color.SteelBlue;
             this.lblTo.Location = new System.Drawing.Point(7, 14);
             this.lblTo.Name = "lblTo";
-            this.lblTo.Size = new System.Drawing.Size(33, 20);
+            this.lblTo.Size = new System.Drawing.Size(36, 20);
             this.lblTo.TabIndex = 0;
             this.lblTo.Text = "To:";
             // 
@@ -59,6 +60,7 @@
             // textBox
             // 
             this.textBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.textBox.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.textBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox.Location = new System.Drawing.Point(11, 87);
             this.textBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -72,34 +74,39 @@
             // 
             this.lblMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblMessage.AutoSize = true;
-            this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMessage.ForeColor = System.Drawing.Color.SteelBlue;
             this.lblMessage.Location = new System.Drawing.Point(8, 64);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(77, 20);
+            this.lblMessage.Size = new System.Drawing.Size(84, 20);
             this.lblMessage.TabIndex = 3;
             this.lblMessage.Text = "Message";
             // 
             // btnSend
             // 
             this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSend.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSend.BackColor = System.Drawing.Color.SteelBlue;
+            this.btnSend.FlatAppearance.BorderColor = System.Drawing.Color.SteelBlue;
+            this.btnSend.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F);
+            this.btnSend.ForeColor = System.Drawing.SystemColors.Window;
             this.btnSend.Location = new System.Drawing.Point(12, 282);
             this.btnSend.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(371, 37);
             this.btnSend.TabIndex = 4;
-            this.btnSend.Text = "Send";
-            this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Text = "SEND";
+            this.btnSend.UseVisualStyleBackColor = false;
             this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
             // lblMaxChars
             // 
             this.lblMaxChars.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblMaxChars.AutoSize = true;
-            this.lblMaxChars.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.2F);
+            this.lblMaxChars.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMaxChars.ForeColor = System.Drawing.Color.SteelBlue;
             this.lblMaxChars.Location = new System.Drawing.Point(263, 70);
             this.lblMaxChars.Name = "lblMaxChars";
-            this.lblMaxChars.Size = new System.Drawing.Size(104, 13);
+            this.lblMaxChars.Size = new System.Drawing.Size(121, 13);
             this.lblMaxChars.TabIndex = 5;
             this.lblMaxChars.Text = "Max. 100 caracteres";
             // 
@@ -107,7 +114,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Control;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(395, 329);
             this.Controls.Add(this.lblMaxChars);
             this.Controls.Add(this.btnSend);

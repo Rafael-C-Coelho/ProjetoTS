@@ -45,39 +45,43 @@
             // 
             // btnNewChat
             // 
-            this.btnNewChat.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnNewChat.Location = new System.Drawing.Point(17, 24);
-            this.btnNewChat.Margin = new System.Windows.Forms.Padding(2);
+            this.btnNewChat.BackColor = System.Drawing.Color.SteelBlue;
+            this.btnNewChat.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Bold);
+            this.btnNewChat.ForeColor = System.Drawing.SystemColors.Window;
+            this.btnNewChat.Location = new System.Drawing.Point(23, 43);
+            this.btnNewChat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnNewChat.Name = "btnNewChat";
-            this.btnNewChat.Size = new System.Drawing.Size(324, 28);
+            this.btnNewChat.Size = new System.Drawing.Size(432, 34);
             this.btnNewChat.TabIndex = 0;
-            this.btnNewChat.Text = "Nova mensagem";
-            this.btnNewChat.UseVisualStyleBackColor = true;
+            this.btnNewChat.Text = "NOVA MENSAGEM ";
+            this.btnNewChat.UseVisualStyleBackColor = false;
             this.btnNewChat.Click += new System.EventHandler(this.btnNewChat_Click);
             // 
             // listBoxMessages
             // 
             this.listBoxMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.listBoxMessages.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.listBoxMessages.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listBoxMessages.FormattingEnabled = true;
-            this.listBoxMessages.Location = new System.Drawing.Point(17, 72);
-            this.listBoxMessages.Margin = new System.Windows.Forms.Padding(2);
+            this.listBoxMessages.ItemHeight = 16;
+            this.listBoxMessages.Location = new System.Drawing.Point(12, 110);
+            this.listBoxMessages.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.listBoxMessages.Name = "listBoxMessages";
-            this.listBoxMessages.Size = new System.Drawing.Size(154, 182);
+            this.listBoxMessages.Size = new System.Drawing.Size(205, 224);
             this.listBoxMessages.TabIndex = 1;
             this.listBoxMessages.SelectedIndexChanged += new System.EventHandler(this.listBoxMessages_SelectedIndexChanged);
             // 
             // txtBoxMessages
             // 
             this.txtBoxMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxMessages.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.txtBoxMessages.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.txtBoxMessages.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtBoxMessages.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.txtBoxMessages.Location = new System.Drawing.Point(187, 72);
-            this.txtBoxMessages.Margin = new System.Windows.Forms.Padding(2);
+            this.txtBoxMessages.Location = new System.Drawing.Point(249, 110);
+            this.txtBoxMessages.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtBoxMessages.Name = "txtBoxMessages";
             this.txtBoxMessages.ReadOnly = true;
-            this.txtBoxMessages.Size = new System.Drawing.Size(154, 182);
+            this.txtBoxMessages.Size = new System.Drawing.Size(205, 224);
             this.txtBoxMessages.TabIndex = 2;
             this.txtBoxMessages.Text = "";
             // 
@@ -85,11 +89,11 @@
             // 
             this.lblMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblMessage.AutoSize = true;
-            this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMessage.Location = new System.Drawing.Point(184, 54);
-            this.lblMessage.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMessage.ForeColor = System.Drawing.Color.SteelBlue;
+            this.lblMessage.Location = new System.Drawing.Point(245, 88);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(77, 17);
+            this.lblMessage.Size = new System.Drawing.Size(99, 20);
             this.lblMessage.TabIndex = 3;
             this.lblMessage.Text = "Mensagem";
             // 
@@ -97,21 +101,23 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(14, 54);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.SteelBlue;
+            this.label1.Location = new System.Drawing.Point(8, 88);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(135, 17);
+            this.label1.Size = new System.Drawing.Size(178, 20);
             this.label1.TabIndex = 4;
-            this.label1.Text = "Lista de mensagens";
+            this.label1.Text = "Lista de Mensagens";
             // 
             // menuStrip1
             // 
+            this.menuStrip1.BackColor = System.Drawing.Color.SteelBlue;
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.settingsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(358, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(477, 30);
             this.menuStrip1.TabIndex = 5;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -121,28 +127,30 @@
             this.refreshMessagesToolStripMenuItem,
             this.destruirUtilizadorToolStripMenuItem,
             this.logoutToolStripMenuItem});
+            this.settingsToolStripMenuItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.settingsToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Window;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
-            this.settingsToolStripMenuItem.Text = "Options";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(104, 26);
+            this.settingsToolStripMenuItem.Text = "OPTIONS";
             // 
             // refreshMessagesToolStripMenuItem
             // 
             this.refreshMessagesToolStripMenuItem.Name = "refreshMessagesToolStripMenuItem";
-            this.refreshMessagesToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.refreshMessagesToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.refreshMessagesToolStripMenuItem.Text = "Refresh messages";
             this.refreshMessagesToolStripMenuItem.Click += new System.EventHandler(this.refreshMessagesToolStripMenuItem_Click);
             // 
             // destruirUtilizadorToolStripMenuItem
             // 
             this.destruirUtilizadorToolStripMenuItem.Name = "destruirUtilizadorToolStripMenuItem";
-            this.destruirUtilizadorToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.destruirUtilizadorToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.destruirUtilizadorToolStripMenuItem.Text = "Destroy user";
             this.destruirUtilizadorToolStripMenuItem.Click += new System.EventHandler(this.destruirUtilizadorToolStripMenuItem_Click);
             // 
             // logoutToolStripMenuItem
             // 
             this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
-            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.logoutToolStripMenuItem.Text = "Logout";
             // 
             // timerFetchMessages
@@ -153,9 +161,10 @@
             // 
             // InBox
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(358, 280);
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.ClientSize = new System.Drawing.Size(477, 345);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblMessage);
@@ -163,7 +172,7 @@
             this.Controls.Add(this.listBoxMessages);
             this.Controls.Add(this.btnNewChat);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "InBox";
             this.Text = "InBox";
             this.menuStrip1.ResumeLayout(false);
