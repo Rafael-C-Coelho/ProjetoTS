@@ -56,7 +56,14 @@ namespace ProjetoTS
                                 FOREIGN KEY (recipient) REFERENCES users(username)
                             );
                         ";
-                        command.ExecuteNonQuery();
+                        try
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                        catch (Exception e)
+                        {
+                            CreateDatabase();
+                        }
                     }
                 }
             }
