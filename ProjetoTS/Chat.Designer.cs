@@ -108,7 +108,7 @@
             this.lblMaxChars.Name = "lblMaxChars";
             this.lblMaxChars.Size = new System.Drawing.Size(121, 13);
             this.lblMaxChars.TabIndex = 5;
-            this.lblMaxChars.Text = "Max. 100 caracteres";
+            this.lblMaxChars.Text = "Max. 100 characters";
             // 
             // Chat
             // 
