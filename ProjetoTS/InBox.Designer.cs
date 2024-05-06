@@ -53,7 +53,7 @@
             this.btnNewChat.Name = "btnNewChat";
             this.btnNewChat.Size = new System.Drawing.Size(432, 34);
             this.btnNewChat.TabIndex = 0;
-            this.btnNewChat.Text = "NOVA MENSAGEM ";
+            this.btnNewChat.Text = "NEW MESSAGE";
             this.btnNewChat.UseVisualStyleBackColor = false;
             this.btnNewChat.Click += new System.EventHandler(this.btnNewChat_Click);
             // 
@@ -93,9 +93,9 @@
             this.lblMessage.ForeColor = System.Drawing.Color.SteelBlue;
             this.lblMessage.Location = new System.Drawing.Point(245, 88);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(99, 20);
+            this.lblMessage.Size = new System.Drawing.Size(84, 20);
             this.lblMessage.TabIndex = 3;
-            this.lblMessage.Text = "Mensagem";
+            this.lblMessage.Text = "Message";
             // 
             // label1
             // 
@@ -105,9 +105,9 @@
             this.label1.ForeColor = System.Drawing.Color.SteelBlue;
             this.label1.Location = new System.Drawing.Point(8, 88);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(178, 20);
+            this.label1.Size = new System.Drawing.Size(122, 20);
             this.label1.TabIndex = 4;
-            this.label1.Text = "Lista de Mensagens";
+            this.label1.Text = "Message List";
             // 
             // menuStrip1
             // 
@@ -130,27 +130,27 @@
             this.settingsToolStripMenuItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.settingsToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Window;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(104, 26);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(104, 24);
             this.settingsToolStripMenuItem.Text = "OPTIONS";
             // 
             // refreshMessagesToolStripMenuItem
             // 
             this.refreshMessagesToolStripMenuItem.Name = "refreshMessagesToolStripMenuItem";
-            this.refreshMessagesToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.refreshMessagesToolStripMenuItem.Size = new System.Drawing.Size(249, 26);
             this.refreshMessagesToolStripMenuItem.Text = "Refresh messages";
             this.refreshMessagesToolStripMenuItem.Click += new System.EventHandler(this.refreshMessagesToolStripMenuItem_Click);
             // 
             // destruirUtilizadorToolStripMenuItem
             // 
             this.destruirUtilizadorToolStripMenuItem.Name = "destruirUtilizadorToolStripMenuItem";
-            this.destruirUtilizadorToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.destruirUtilizadorToolStripMenuItem.Size = new System.Drawing.Size(249, 26);
             this.destruirUtilizadorToolStripMenuItem.Text = "Destroy user";
             this.destruirUtilizadorToolStripMenuItem.Click += new System.EventHandler(this.destruirUtilizadorToolStripMenuItem_Click);
             // 
             // logoutToolStripMenuItem
             // 
             this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
-            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(249, 26);
             this.logoutToolStripMenuItem.Text = "Logout";
             // 
             // timerFetchMessages
