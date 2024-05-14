@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Reference Include="protoip">
-      <HintPath>Z:\TS\protoip.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\protoip.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -278,12 +278,15 @@ namespace Server
                     packet.SetPayload(GenerateAuthtoken(username));
                     Send(Packet.Serialize(packet), userID);
                     Console.WriteLine("User registered successfully.");
+                    logger.Info("User registered successfully for username: " + username); 
+
                 } catch (Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.REGISTER_ERROR);
                     packet.SetPayload(e.Message);
                     Send(Packet.Serialize(packet), userID);
                     Console.WriteLine("Error registering user: " + e.Message);
+                    logger.Error("Error registering user: " + e.Message);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN)
             {
@@ -308,6 +311,7 @@ namespace Server
                     Packet packet = new Packet((int)ChatPacket.Type.LOGIN_ERROR);
                     packet.SetPayload(e.Message);
                     Send(Packet.Serialize(packet), userID);
+                    logger.Error("Error logging in for username: " + username + ". Error: " + e.Message);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGOUT)
             {
@@ -321,11 +325,13 @@ namespace Server
                     Packet packet = new Packet((int)ChatPacket.Type.LOGOUT);
                     packet.SetPayload("Logout successful");
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("Loggout sucessfully");
                 } catch (Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.LOGOUT);
                     packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("Error logout for username: " + username + ". Error " + e.Message);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS)
             {
@@ -339,11 +345,13 @@ namespace Server
                     Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS_SUCCESS);
                     packet.SetPayload(string.Join(",", users));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("User " + username + " successfully added to the list ");
                 } catch (Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS_ERROR);
                     packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("User has not been entered in the list");
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_MESSAGES)
             {

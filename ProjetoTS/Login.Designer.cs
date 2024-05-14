@@ -112,6 +112,7 @@
             this.txtBoxPassword.PasswordChar = '*';
             this.txtBoxPassword.Size = new System.Drawing.Size(369, 22);
             this.txtBoxPassword.TabIndex = 5;
+
             // 
             // Login
             // 
