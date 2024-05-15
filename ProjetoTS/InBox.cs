@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System.Security.Principal;
 
 namespace ProjetoTS
 {
@@ -114,6 +115,17 @@ namespace ProjetoTS
             {
                 logger.Error("Error: " + ex.Message);
             }
+        }
+
+        private void lblname_Click(object sender, EventArgs e)
+        {
+            string username = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+        }
+
+        private void InBox_Load(object sender, EventArgs e)
+        {
+            txtBoxUser.Text = Login.showUser;
+            
         }
     }
 

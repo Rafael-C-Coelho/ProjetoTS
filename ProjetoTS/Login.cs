@@ -22,6 +22,13 @@ namespace ProjetoTS
         {
             InitializeComponent();
         }
+
+        public static string username;
+        public static string showUser
+        {
+            get { return username; }
+            set {username = value; }
+        }     
         private bool ValidatePassword(string password, out string ErrorMessage) // méotodo para validações de password com regex aquando o registo do cliente.
         {
 
@@ -87,9 +94,9 @@ namespace ProjetoTS
         }
 
 
-
         private void buttonLogin_Click(object sender, EventArgs e)
         {
+            showUser = txtBoxUsername.Text;
             LoginClient client = new LoginClient(this);
             Packet packet = new Packet((int)ChatPacket.Type.LOGIN);
             packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text));
