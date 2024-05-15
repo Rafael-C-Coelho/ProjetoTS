@@ -27,6 +27,7 @@ namespace ProjetoTS
 
         private void Chat_Load(object sender, EventArgs e)
         {
+            txtBoxUser.Text = Login.showUser;
             ChatClient client = new ChatClient(this, this.username);
             Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS);
             packet.SetPayload(client.EncryptMessageWithAES(client.authtoken));

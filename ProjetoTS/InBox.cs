@@ -127,6 +127,8 @@ namespace ProjetoTS
             txtBoxUser.Text = Login.showUser;
             
         }
+
+
     }
 
     class InBoxClient : Client
