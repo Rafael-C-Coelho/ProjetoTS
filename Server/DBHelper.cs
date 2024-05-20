@@ -10,11 +10,13 @@ namespace Server
 {
     internal class DBHelper
     {
+        //construtor responsável por instanciar a classe DBhelper que vai criar a base de dados com o método "CreateDatabase()"
         public DBHelper()
         {
             CreateDatabase();
         }
 
+        // caminho/ligação entre a base de dados e o projeto 
         public static string GetConnectionString()
         {
             return Path.Combine(
@@ -24,6 +26,7 @@ namespace Server
             );
         }
 
+        //criação da base de dados e das respetivas tabelas necessárias (users,messages, token, directory) para armazenar os dados provenientes dos utilizadores 
         public static void CreateDatabase()
         {
             string connectionString = GetConnectionString();
@@ -85,7 +88,7 @@ namespace Server
                 }
             }
         }
-
+        //introdução dos valores do utilizador na base de dados (username, password e chave pública)
         public void InsertUser(string username, string password, string publicKey)
         {
             string connectionString = GetConnectionString();
@@ -105,7 +108,7 @@ namespace Server
                 }
             }
         }
-
+        //conexão e consulta da base de dados SQL lite para obtenção da chave pública que está associada ao nome do utilizador em questão e depois retorna essa chave 
         public string GetUserPublicKey(string username)
         {
             string publicKey = "";
@@ -132,6 +135,7 @@ namespace Server
             return publicKey;
         }
 
+        //conexão e consulta da base SQL Lite de dados para selecionar a chave AES que está associada ao nome do utilizador em questão e depois retorna essa chave 
         public string GetUserAESKey(string username)
         {
             string aesKey = "";
@@ -158,6 +162,7 @@ namespace Server
             return aesKey;
         }
 
+        //conexão à base de dados SQL Lite e realização de consulta para selecionar o ID do utilizador, da tabela users, retornando-o caso seja selecionado. Senão retorna uma string vazia  
         private int GetUserId(string username)
         {
             int id = -1;
@@ -184,6 +189,7 @@ namespace Server
             return id;
         }
 
+        //conexão à base de dados SQL Lite e consulta SQL do username do utilizador que está associado a um Id na tabela users. Após associar o nome ao id, retorna o username. 
         private string GetUsername(int id)
         {
             string username = "";
@@ -210,6 +216,7 @@ namespace Server
             return username;
         }
 
+        //conexão à base de dados SQL Lite e realização de uma consulta SQL para obter a chave pública associada ao username de um utilizador presente na tabela users. Caso a associe, retorna a chave pública em questão
         public string GetPublicKey(string username)
         {
             string publicKey = "";
@@ -236,6 +243,7 @@ namespace Server
             return publicKey;
         }
 
+        // listagem de todos os utilizadores que se encontram registados na base de dados SQL Lite, mais especificamente na tabela users 
         public List<string> ListUsers()
         {
             List<string> users = new List<string>();
@@ -259,6 +267,8 @@ namespace Server
             }
             return users;
         }
+
+        // listagem de todas mensagens que se encontram registadas na base de dados SQL Lite, mais especificamente na tabela messages 
 
         public List<string> ListMessages(string recipient)
         {
@@ -287,6 +297,8 @@ namespace Server
             return messages;
         }
 
+        // conexão à base de dados SQL Lite para adicionar um novo registo, uma a mensagem na tabela mensagem,
+        // sendo associada a um remetente e destinatário, bem como ao registo de data/hora do envio da mesma 
         public void InsertMessage(string message, string sender, string recipient)
         {
             string connectionString = GetConnectionString();
@@ -308,6 +320,7 @@ namespace Server
             }
         }
 
+        // conexão à base de dados SQL Lite para adicionar o novo registo do token de acesso de um utilizador específico na tabela token 
         public void InsertToken(string token, string user)
         {
             string connectionString = GetConnectionString();
@@ -327,6 +340,7 @@ namespace Server
             }
         }
 
+        //Conexão à base de dados SQL Lite para eliminar o registo do token do utilizador da tabela Token 
         public void DeleteToken(string token)
         {
             string connectionString = GetConnectionString();
@@ -345,6 +359,7 @@ namespace Server
             }
         }
 
+        //Conexão à base de dados SQL Lite para eliminar o registo do utilizador da tabela mensagens enquanto destinatário e remetente, da tabela token e users 
         public void DeleteUser(string username)
         {
             int usernameID = GetUserId(username);
@@ -383,6 +398,8 @@ namespace Server
             }
         }
 
+        // conexão à base de dados SQL Lite e uso do comando SQL para verificar se um utilizador se encontra registado com um determinado username e password na tabela users.
+        // Como se trata de um bool, se o utilizador existir retronará verdadeiro, ou então falso se náo houver uma associação 
         public bool CheckUser(string username, string password)
         {
             bool exists = false;
@@ -410,6 +427,8 @@ namespace Server
             return exists;
         }
 
+        // neste método é estabelecidade uma conexão com a base de dados SQL Lite e efetuada uma consulta com o comando SQL para se obter o Id de um utilizador associado ao token correspondente na tabela token.
+        // Se o token for encontrado, é retornado o nome do utilizador associado ao token. Se não for encontrado, é lançada uma exceção e apresentada a mensagem "Invalid token".
         public string GetUserFromToken(string token)
         {
             string user = "";
