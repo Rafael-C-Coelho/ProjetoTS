@@ -66,7 +66,7 @@ namespace Server
         public ChatServer()
         {
             logger = new Logger("server_logs.log");
-            // Load server's private key or generate a new one if not exists
+            // Carrega a chave privada do servidor ou gera uma nova se não existir
             if (File.Exists(ServerPrivateKeyPath))
             {
                 logger.Info($"Loading the RSA keys at {ServerPrivateKeyPath}...");
@@ -101,7 +101,8 @@ namespace Server
             Console.WriteLine("Finished");
         }
 
-        public static string GenerateAuthtoken(string username)
+        //gera o token de autenticação 
+        public static string GenerateAuthtoken(string username) 
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             string auth = new string(Enumerable.Repeat(chars, 16).Select(s => s[random.Next(s.Length)]).ToArray());
@@ -110,6 +111,7 @@ namespace Server
             return auth;
         }
 
+        //descriptação da mensagem através do algortimo AES e RSA
         public byte[] DecryptMessageWithAES(byte[] data)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
@@ -132,6 +134,7 @@ namespace Server
             }
         }
 
+        //Criptografar mensagem com chave pública com RSA
         public byte[] EncryptMessageWithPublicKey(byte[] data, string publicKeyXml)
         {
             if (data.Length == 0)
@@ -145,6 +148,7 @@ namespace Server
             }
         }
 
+        //criptografar mensagem com recurso ao algortimo 
         public byte[] EncryptMessageWithAES(string message, string username)
         {
             using (RSA rsa = RSA.Create())
@@ -185,7 +189,7 @@ namespace Server
 
             using (RSA rsa = RSA.Create())
             {
-                // Import RSA private key parameters from XML string
+                // Importar parâmetros de chave privada RSA da cadeia XML
                 rsa.FromXmlString(KeyXML);
 
                 keyRSA = rsa.ExportParameters(isPrivate);
@@ -200,7 +204,7 @@ namespace Server
             return Convert.ToHexString(hashBytes);
         }
 
-        // Encrypt data using RSA
+        // Encriptar dados usando o algortimo RSA 
         public byte[] EncryptDataWithRSA(string data, RSAParameters publicKey)
         {
             using (RSA rsa = RSA.Create())
@@ -224,10 +228,10 @@ namespace Server
             encryptedMessage.CopyTo(bytes, encryptedAESKey.Length);
 
             return bytes;
-        }   
+        }
 
-        // Decrypt data using RSA
-        public byte[] DecryptDataWithRSA(byte[] encryptedData)
+        // Desencriptar dados usando o algortimo RSA
+        public byte[] DecryptDataWithRSA(byte[] encryptedData)  
         {
             using (RSA rsa = RSA.Create())
             {
@@ -236,7 +240,8 @@ namespace Server
             }
         }
 
-        private byte[] DecryptMessage(Packet receivedPacket)
+        //Caso os dados não estejam vazios, a mensagem é desencriptada através do algortimo AES 
+        private byte[] DecryptMessage(Packet receivedPacket) 
         {
             byte[] data = receivedPacket.GetDataAs<byte[]>();
             if (data.Length == 0)
@@ -247,6 +252,7 @@ namespace Server
             return decryptedData;
         }
 
+        // Serialização da chave pública com algortimo RSA
         private string SerializePublicKey(RSAParameters serverPrivateKey)
         {
             using (RSA rsa = RSA.Create())
@@ -264,7 +270,7 @@ namespace Server
 
             if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER)
             {
-                // Decrypt register data with server's private key
+                // Desencriptar dados de registo com a chave privada do servidor
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string username = parts[0];
@@ -290,7 +296,7 @@ namespace Server
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN)
             {
-                // Decrypt login data with server's private key
+                // Desencriptar dados de início de sessão com a chave privada do servidor
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string username = parts[0];
