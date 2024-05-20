@@ -23,13 +23,14 @@ namespace ProjetoTS
             InitializeComponent();
         }
 
-        public static string username;
-        public static string showUser
+        public static string username; // propriedade que permite guardar o nome do utilizador 
+        public static string showUser //propriedade com encapsulamento do username 
         {
-            get { return username; }
-            set {username = value; }
+            get { return username; } // retorna o valor de username 
+            set {username = value; } // define o valor do username e atualiza-o
         }     
-        private bool ValidatePassword(string password, out string ErrorMessage) // méotodo para validações de password com regex aquando o registo do cliente.
+        private bool ValidatePassword(string password, out string ErrorMessage) // método com diversas validações de password com regex
+                                                                                // aquando o login do cliente.
         {
 
             var input = password;
@@ -74,38 +75,39 @@ namespace ProjetoTS
 
         }
 
-        private void buttonRegister_Click(object sender, EventArgs e)
+        private void buttonRegister_Click(object sender, EventArgs e) 
         {
-            string errorMessage;
+            string errorMessage; //string que irá conter as mensagens de erro
 
-            if (!ValidatePassword(txtBoxPassword.Text, out errorMessage))
+            if (!ValidatePassword(txtBoxPassword.Text, out errorMessage))  //verificação da password 
             {
-                MessageBox.Show("Error: " + errorMessage);
+                MessageBox.Show("Error: " + errorMessage); 
                 return;
             }
 
-            LoginClient client = new LoginClient(this);
+            LoginClient client = new LoginClient(this); //criação do cliente para login 
             Packet packet = new Packet((int)ChatPacket.Type.REGISTER);
-            client.CreateClientKeys(txtBoxUsername.Text);
-            packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text + ":" + client.clientPublicKeyString));
+            client.CreateClientKeys(txtBoxUsername.Text); //criação das chaves criptografadas
+            packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text + ":" + client.clientPublicKeyString));// criação e envio de um pacote com informações criptografadas (nome de utilizador, senha e chave pública) para o servidor
             client.Send(Packet.Serialize(packet));
-            client.Receive();
-            client.Disconnect();
+            client.Receive(); //resposta do servidor 
+            client.Disconnect(); //desconexão do cliente
         }
 
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
-            showUser = txtBoxUsername.Text;
-            LoginClient client = new LoginClient(this);
-            Packet packet = new Packet((int)ChatPacket.Type.LOGIN);
-            packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text));
-            client.Send(Packet.Serialize(packet));
-            client.Receive();
+            showUser = txtBoxUsername.Text; //permite que o nome do utilizador apareça no form InBox e Chat 
+            LoginClient client = new LoginClient(this); //instanciação neecssária para a comunicação com o servidor 
+            Packet packet = new Packet((int)ChatPacket.Type.LOGIN); //criação do pacote de dados para o Login 
+            packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text)); //mensagem criptografada a enviar para o servidor, sob a forma de pacote
+            client.Send(Packet.Serialize(packet)); //serialização do pacote e envio para o servidor 
+            client.Receive(); 
             client.Disconnect();
+            //após o envio, aguarda-se que o cliente receba a mensagem do servidor e se desconecte 
         }
 
-        public string GetUsername()
+        public string GetUsername() //obter username do utilizador 
         {
             return txtBoxUsername.Text;
         }
@@ -115,19 +117,20 @@ namespace ProjetoTS
     class LoginClient : Client
     {
         private Login form;
-        private DBHelper dbhelper;
+        private DBHelper dbhelper; // classe Dbhelper permite interagir com a base de dados 
 
-        public LoginClient(Login form) : base()
+        public LoginClient(Login form) : base() // o contrutor vai permitir estabelecer uma conexão entre a base de dados e o form do login
         {
             this.form = form;
             dbhelper = new DBHelper();
         }
 
-        public override void OnReceive()
+        public override void OnReceive() //método responsável por diversas verificações no envio de pacotes de dados para o servidor 
         {
-            Packet receivedPacket = AssembleReceivedDataIntoPacket();
+            Packet receivedPacket = AssembleReceivedDataIntoPacket(); 
 
-            if (receivedPacket._GetType() == (int)ChatPacket.Type.SERVER_PUBLIC_KEY)
+            if (receivedPacket._GetType() == (int)ChatPacket.Type.SERVER_PUBLIC_KEY) // ocorre uma verificação do pacote que contém a chave pública no decorrer do processo de envio, obtenção e deserialização da chave pública pelo servidor,
+                                                                                     // que depois armazena-a e desconecta-se 
             {
                 byte[] data = receivedPacket.GetDataAs<byte[]>();
                 string message = Encoding.UTF8.GetString(data);
@@ -135,12 +138,16 @@ namespace ProjetoTS
                 serverPublicKey = publicKey;
                 Disconnect();
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER_ERROR)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER_ERROR) //caso ocorra um erro no processo de envio do pacote descrito anteriormente,
+                                                                                       //apresenta uma mensagem de erro e desconeta-se 
             {
                 MessageBox.Show("Error: " + receivedPacket.GetDataAs<string>());
                 Disconnect();
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER_SUCCESS)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.REGISTER_SUCCESS) //caso o pacote com os dados de registo do utilizador (username) tenha sido enviado com sucesso para o servidor,
+                                                                                         //é enviada uma mensagem ao utilizador. Paralelamente,atualiza o token de autenticação do utilizador no banco de dados,
+                                                                                         //por via do dbhelper e carrega as chaves do cliente. Por fim, surge a página das mensagens inBox, a página de login é fechada e há a desconexão utilizador - servidor 
+
             {
                 MessageBox.Show("Success");
                 string username = this.form.GetUsername();
@@ -151,12 +158,14 @@ namespace ProjetoTS
                 this.form.Hide();
                 Disconnect();
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN_ERROR)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN_ERROR) // erro no envio do pacote, que culmina numa mensagem indicando isso mesmo e a desconexão user - servidor 
             {
                 MessageBox.Show("Error: " + receivedPacket.GetDataAs<string>());
                 Disconnect();
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN_SUCCESS)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGIN_SUCCESS) // caso o login tenha sido efetuado com sucesso, é apresentada uma mensagem referindo isso mesmo, são carregadas as chaves do cliente
+                                                                                      // e atualizados os tokens de autentição do utilizador no banco de dados através do dbhelper.
+                                                                                      // Depois, é aberto o form inBox e o form de login é fechado, termina coma  desconexão entre o utilizador e o servidor
             {
                 MessageBox.Show("Success");
                 string username = this.form.GetUsername();
