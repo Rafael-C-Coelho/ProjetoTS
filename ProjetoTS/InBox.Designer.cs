@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InBox));
             this.btnNewChat = new System.Windows.Forms.Button();
             this.listBoxMessages = new System.Windows.Forms.ListBox();
             this.txtBoxMessages = new System.Windows.Forms.RichTextBox();
@@ -193,6 +194,7 @@
             this.Controls.Add(this.txtBoxMessages);
             this.Controls.Add(this.listBoxMessages);
             this.Controls.Add(this.btnNewChat);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "InBox";

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
             this.buttonLogin = new System.Windows.Forms.Button();
             this.buttonRegister = new System.Windows.Forms.Button();
             this.lblUsername = new System.Windows.Forms.Label();
@@ -112,7 +113,6 @@
             this.txtBoxPassword.PasswordChar = '*';
             this.txtBoxPassword.Size = new System.Drawing.Size(369, 22);
             this.txtBoxPassword.TabIndex = 5;
-
             // 
             // Login
             // 
@@ -126,6 +126,7 @@
             this.Controls.Add(this.lblUsername);
             this.Controls.Add(this.buttonRegister);
             this.Controls.Add(this.buttonLogin);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Login";
             this.Text = "Login";
