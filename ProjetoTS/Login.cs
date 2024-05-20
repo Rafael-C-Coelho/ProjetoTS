@@ -23,12 +23,18 @@ namespace ProjetoTS
             InitializeComponent();
         }
 
-        public static string username; // propriedade que permite guardar o nome do utilizador 
+        public static string username; 
         public static string showUser //propriedade com encapsulamento do username 
         {
             get { return username; } // retorna o valor de username 
             set {username = value; } // define o valor do username e atualiza-o
-        }     
+        }
+        
+        public static string usernameRegister
+        {
+            get { return username; }
+            set { username = value; }
+        }
         private bool ValidatePassword(string password, out string ErrorMessage) // método com diversas validações de password com regex
                                                                                 // aquando o login do cliente.
         {
@@ -84,7 +90,8 @@ namespace ProjetoTS
                 MessageBox.Show("Error: " + errorMessage); 
                 return;
             }
-
+            
+            usernameRegister = txtBoxUsername.Text;
             LoginClient client = new LoginClient(this); //criação do cliente para login 
             Packet packet = new Packet((int)ChatPacket.Type.REGISTER);
             client.CreateClientKeys(txtBoxUsername.Text); //criação das chaves criptografadas
@@ -92,6 +99,8 @@ namespace ProjetoTS
             client.Send(Packet.Serialize(packet));
             client.Receive(); //resposta do servidor 
             client.Disconnect(); //desconexão do cliente
+          
+            
         }
 
 
@@ -111,6 +120,7 @@ namespace ProjetoTS
         {
             return txtBoxUsername.Text;
         }
+
 
     }
 

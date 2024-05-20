@@ -31,7 +31,7 @@ namespace ProjetoTS
             FetchNewMessages();
         }
 
-        private void FetchNewMessages()
+        private void FetchNewMessages() //método que permite obter novas mensagens. 
         {
             client = new InBoxClient(this, this.username);
             Packet packet = new Packet((int)ChatPacket.Type.LIST_MESSAGES);
@@ -41,7 +41,7 @@ namespace ProjetoTS
             client.Disconnect();
         }
 
-        public void AddMessage(string username, string message)
+        public void AddMessage(string username, string message) // método para adicionar novas mensagens pelo username.
         {
             foreach (string messageStored in messages)
             {
@@ -125,7 +125,8 @@ namespace ProjetoTS
         private void InBox_Load(object sender, EventArgs e)
         {
             txtBoxUser.Text = Login.showUser;
-            
+            txtBoxUser.Text = Login.usernameRegister; 
+    
         }
 
 
