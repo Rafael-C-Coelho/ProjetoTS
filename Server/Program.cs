@@ -19,7 +19,7 @@ namespace Server
     class ChatPacket : Packet
     {
         public enum Type
-        {
+        { //enumeração dos tipos de mensagens correspondentes ao número que surge quando se efetua o debug do servidor. Por exemplo, se surgir o número 6 quer dizer que estamos perante um "LOGIN_ERROR"
             SERVER_PUBLIC_KEY = 1,
             AES_KEY,
             PING,
@@ -320,7 +320,7 @@ namespace Server
                     logger.Error("Error logging in for username: " + username + ". Error: " + e.Message);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGOUT)
-            {
+            { // remove o token de autenticação do utulizador e assume o logout
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string username = parts[0];
@@ -340,7 +340,7 @@ namespace Server
                     logger.Info("Error logout for username: " + username + ". Error " + e.Message);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS)
-            {
+            { // vai listar os utilizadores que estão conectados  
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string authtoken = parts[0];
@@ -360,7 +360,7 @@ namespace Server
                     logger.Info("User has not been entered in the list");
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_MESSAGES)
-            {
+            { //listagem das mensagens de um utilizador 
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string authtoken = parts[0];
@@ -377,7 +377,7 @@ namespace Server
                     Send(Packet.Serialize(packet), userID);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE)
-            {
+            { //envio de mensagem para a base de dados e depois para o utilizador 
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string authtoken = parts[0];
@@ -398,7 +398,7 @@ namespace Server
                     Send(Packet.Serialize(packet), userID);
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY)
-            {
+            { //envio da chave pública de um utilizador para o outro 
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string authtoken = parts[0];
@@ -432,9 +432,10 @@ namespace Server
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 aesKey = new AES(DecryptDataWithRSA(Convert.FromBase64String(parts[0])));
-            }
+            } 
             else if (receivedPacket._GetType() == (int)ChatPacket.Type.DELETE_USER)
             {
+                // elimina um utilizador da base de dados
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
                 string[] parts = message.Split(':');
                 string authtoken = parts[0];
@@ -455,6 +456,7 @@ namespace Server
         }
     }
 
+    // a classe Program começa por definir a porta do servidor que será 1111 depois vai ser instanciado um novo chat através de uma nova thread 
     class Program
     {
         const int PORT = 1111;
