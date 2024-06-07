@@ -82,7 +82,7 @@ namespace ProjetoTS
                         logger.Info("Encrypted:" + messages[listBoxMessages.SelectedIndex]);
                     } catch (CryptographicException)
                     {
-                        logger.Error("Error: Could not decrypt message. Either the keys have changed or been deleted.");
+                        MessageBox.Show("Error: Could not decrypt message. Either the keys have changed or been deleted.");
                         txtBoxMessages.Text = "Error: Could not decrypt message. Either the keys have changed or been deleted.";
                     }
                 }
@@ -101,7 +101,7 @@ namespace ProjetoTS
                 FetchNewMessages();
             } catch (Exception ex)
             {
-                logger.Error("Error: " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message);
             }
         }
 
@@ -113,7 +113,7 @@ namespace ProjetoTS
             }
             catch (Exception ex)
             {
-                logger.Error("Error: " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message);
             }
         }
 
