@@ -13,9 +13,10 @@ using System.IO.Compression;
 using ProtoIP.Crypto;
 using RSA = System.Security.Cryptography.RSA;
 
-//EXERCÍCIO B
+
 namespace Server
 {
+   
     class ChatPacket : Packet
     {
         public enum Type
@@ -165,6 +166,7 @@ namespace Server
                 byte[] encryptedAESKey = EncryptMessageWithPublicKey(aesKey.GetKeyBytes(), rsa.ToXmlString(false));
                 return encryptedAESKey.Concat(encryptedData).ToArray();
             }
+           
         }
 
         private void SaveRSAParameters(RSAParameters parameters, string filePath)
@@ -352,6 +354,7 @@ namespace Server
                     packet.SetPayload(string.Join(",", users));
                     Send(Packet.Serialize(packet), userID);
                     logger.Info("User " + username + " successfully added to the list ");
+
                 } catch (Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS_ERROR);
@@ -370,11 +373,13 @@ namespace Server
                     Packet packet = new Packet((int)ChatPacket.Type.LIST_MESSAGES_SUCCESS);
                     packet.SetPayload(EncryptMessageWithAES(string.Join(";", dbhelper.ListMessages(username)), username));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("Info: Message list created successfully");
                 } catch(Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.LIST_MESSAGES_ERROR);
                     packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Error("Error: Message list error");
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE)
             { //envio de mensagem para a base de dados e depois para o utilizador 
@@ -390,12 +395,14 @@ namespace Server
                     Packet packet = new Packet((int)ChatPacket.Type.SEND_MESSAGE_SUCCESS);
                     packet.SetPayload("Message sent successfully");
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("Info: Public key sended with success");
                 } catch(Exception e)
                 {
                     dbhelper.DeleteToken(authtoken);
                     Packet packet = new Packet((int)ChatPacket.Type.SEND_MESSAGE_ERROR);
                     packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Error("Error: Error sending message"); 
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY)
             { //envio da chave pública de um utilizador para o outro 
@@ -410,11 +417,13 @@ namespace Server
                     Packet packet = new Packet((int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_SUCCESS);
                     packet.SetPayload(EncryptMessageWithAES(userToPublicKey, username));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("Info: Public key sended with success");
                 } catch(Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_ERROR);
                     packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Error("Error: Error sending public key.");
                 }
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SERVER_PUBLIC_KEY)
             {
@@ -427,6 +436,7 @@ namespace Server
                 Send(Packet.Serialize(serverPublicKeyPacket), userID);
 
                 Console.WriteLine("Server's public key sent.");
+                logger.Info("Info: Server's public key sent.");
             } else if (receivedPacket._GetType() == (int)ChatPacket.Type.AES_KEY)
             {
                 string message = Encoding.UTF8.GetString(DecryptMessage(receivedPacket));
@@ -445,12 +455,15 @@ namespace Server
                     dbhelper.DeleteUser(username);
                     Packet packet = new Packet((int)ChatPacket.Type.DELETE_USER_SUCCESS);
                     Send(Packet.Serialize(packet), userID);
+                    logger.Info("Info: Delete user with success.");
                 }
                 catch (Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.DELETE_USER_ERROR);
                     packet.SetPayload(Encoding.UTF8.GetBytes(e.Message));
                     Send(Packet.Serialize(packet), userID);
+                    logger.Error("Error: Error deleting user.");
+
                 }
             }
         }
@@ -472,6 +485,7 @@ namespace Server
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                
             }
         }
     }

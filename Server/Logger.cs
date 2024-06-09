@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    internal class Logger //classe que permite criar o ficheiro do log onde são registados todos os eventos do sistema, como erros, alertas e alterações no sistema 
+    internal class Logger 
     {
         public string logFilePath { get; set; } //guarda o caminho completo do ficheiro log onde as mensagens serão registadas 
 

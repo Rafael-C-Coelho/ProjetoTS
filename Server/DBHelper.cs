@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Server
 {
     internal class DBHelper
     {
+        private Logger logger = new Logger("DBHelper.log");
         //construtor responsável por instanciar a classe DBhelper que vai criar a base de dados com o método "CreateDatabase()"
         public DBHelper()
         {
@@ -107,7 +109,9 @@ namespace Server
                     command.ExecuteNonQuery();
                 }
             }
+            logger.Info("Info:User data entered successfully");
         }
+
         //conexão e consulta da base de dados SQL lite para obtenção da chave pública que está associada ao nome do utilizador em questão e depois retorna essa chave 
         public string GetUserPublicKey(string username)
         {
@@ -115,6 +119,7 @@ namespace Server
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
+                logger.Info($" Info: Starting to obtain the publick key for {username}");
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -130,6 +135,8 @@ namespace Server
                             publicKey = reader.GetString(0);
                         }
                     }
+
+                    logger.Info($"Info: Public key successfully obtained for the user: {username} ");
                 }
             }
             return publicKey;
@@ -142,6 +149,7 @@ namespace Server
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
+                logger.Info($" Info: Starting to obtain the AESkey for {username}");
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -159,12 +167,14 @@ namespace Server
                     }
                 }
             }
+            logger.Info("Info: User AESKEY successfully obtained");
             return aesKey;
         }
 
         //conexão à base de dados SQL Lite e realização de consulta para selecionar o ID do utilizador, da tabela users, retornando-o caso seja selecionado. Senão retorna uma string vazia  
         private int GetUserId(string username)
         {
+            logger.Info("Info: Getting User Id...");
             int id = -1;
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
@@ -186,6 +196,7 @@ namespace Server
                     }
                 }
             }
+            logger.Info($"Info: User id successfully obtained for {username}.");
             return id;
         }
 
@@ -196,6 +207,7 @@ namespace Server
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
+                logger.Info("Info: Getting username...");
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -212,6 +224,7 @@ namespace Server
                         }
                     }
                 }
+                logger.Info("Info: Username successfully obtained.");
             }
             return username;
         }
@@ -223,6 +236,7 @@ namespace Server
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
+                logger.Info("Info: Getting public key...");
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -239,6 +253,7 @@ namespace Server
                         }
                     }
                 }
+                logger.Info("Info: Public key successfully obtained.");
             }
             return publicKey;
         }
@@ -265,6 +280,7 @@ namespace Server
                     }
                 }
             }
+            logger.Info("Info: Users sucessfully listed.");
             return users;
         }
 
@@ -318,6 +334,8 @@ namespace Server
                     command.ExecuteNonQuery();
                 }
             }
+
+            logger.Info("Info: Message successfully inserted ");
         }
 
         // conexão à base de dados SQL Lite para adicionar o novo registo do token de acesso de um utilizador específico na tabela token 
@@ -338,6 +356,7 @@ namespace Server
                     command.ExecuteNonQuery();
                 }
             }
+            logger.Info("Info: Token successfully inserted ");
         }
 
         //Conexão à base de dados SQL Lite para eliminar o registo do token do utilizador da tabela Token 
@@ -346,6 +365,7 @@ namespace Server
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
+                logger.Info("Info: Deleting token...");
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -357,6 +377,8 @@ namespace Server
                     command.ExecuteNonQuery();
                 }
             }
+
+            logger.Info("Info: Token deleted sucessfully.");
         }
 
         //Conexão à base de dados SQL Lite para eliminar o registo do utilizador da tabela mensagens enquanto destinatário e remetente, da tabela token e users 
@@ -376,6 +398,7 @@ namespace Server
                     command.Parameters.AddWithValue("@recipient", usernameID);
                     command.Parameters.AddWithValue("@sender", usernameID);
                     command.ExecuteNonQuery();
+                    logger.Info("Info: User successfully deleted from messages table.");
                 }
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -385,6 +408,7 @@ namespace Server
                     ";
                     command.Parameters.AddWithValue("@user", usernameID);
                     command.ExecuteNonQuery();
+                    logger.Info("Info: User successfully deleted from token table.");
                 }
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -394,6 +418,7 @@ namespace Server
                     ";
                     command.Parameters.AddWithValue("@username", username);
                     command.ExecuteNonQuery();
+                    logger.Info("Info: User successfully deleted from users table");
                 }
             }
         }
@@ -406,6 +431,7 @@ namespace Server
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
+                logger.Info("Info: User verification has started");
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -422,8 +448,11 @@ namespace Server
                             exists = true;
                         }
                     }
+
+                    logger.Info("Info: User verification has finished");
                 }
             }
+
             return exists;
         }
 
@@ -435,6 +464,7 @@ namespace Server
             string connectionString = GetConnectionString();
             using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
             {
+                logger.Info("Info: Getting user from token...");
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
@@ -454,6 +484,7 @@ namespace Server
             }
             if (user == "")
             {
+                logger.Warn($"Warn: Invalid token: {token}");
                 throw new Exception("Invalid token");
             }
             return user;

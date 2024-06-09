@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
@@ -18,6 +19,7 @@ namespace ProjetoTS
 {
     public partial class Login : Form
     {
+
         public Login()
         {
             InitializeComponent();
@@ -35,6 +37,8 @@ namespace ProjetoTS
             get { return username; }
             set { username = value; }
         }
+
+       
         private bool ValidatePassword(string password, out string ErrorMessage) // método com diversas validações de password com regex
                                                                                 // aquando o login do cliente.
         {
@@ -81,16 +85,16 @@ namespace ProjetoTS
 
         }
 
-        private void buttonRegister_Click(object sender, EventArgs e) 
+        private void buttonRegister_Click_1(object sender, EventArgs e)
         {
             string errorMessage; //string que irá conter as mensagens de erro
 
             if (!ValidatePassword(txtBoxPassword.Text, out errorMessage))  //verificação da password 
             {
-                MessageBox.Show("Error: " + errorMessage); 
+                MessageBox.Show("Error: " + errorMessage);
                 return;
             }
-            
+
             usernameRegister = txtBoxUsername.Text;
             LoginClient client = new LoginClient(this); //criação do cliente para login 
             Packet packet = new Packet((int)ChatPacket.Type.REGISTER);
@@ -99,21 +103,18 @@ namespace ProjetoTS
             client.Send(Packet.Serialize(packet));
             client.Receive(); //resposta do servidor 
             client.Disconnect(); //desconexão do cliente
-          
-            
         }
-
-
-        private void buttonLogin_Click(object sender, EventArgs e)
+    
+        private void buttonLogin_Click_1(object sender, EventArgs e)
         {
             showUser = txtBoxUsername.Text; //permite que o nome do utilizador apareça no form InBox e Chat 
             LoginClient client = new LoginClient(this); //instanciação neecssária para a comunicação com o servidor 
             Packet packet = new Packet((int)ChatPacket.Type.LOGIN); //criação do pacote de dados para o Login 
             packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text)); //mensagem criptografada a enviar para o servidor, sob a forma de pacote
             client.Send(Packet.Serialize(packet)); //serialização do pacote e envio para o servidor 
-            client.Receive(); 
+            client.Receive();
             client.Disconnect();
-            //após o envio, aguarda-se que o cliente receba a mensagem do servidor e se desconecte 
+            //após o envio, aguarda-se que o cliente receba a mensagem do servidor e se desconecte
         }
 
         public string GetUsername() //obter username do utilizador 
@@ -121,7 +122,7 @@ namespace ProjetoTS
             return txtBoxUsername.Text;
         }
 
-
+       
     }
 
     class LoginClient : Client

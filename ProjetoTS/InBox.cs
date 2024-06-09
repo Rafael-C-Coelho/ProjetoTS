@@ -52,6 +52,7 @@ namespace ProjetoTS
             }
             listBoxMessages.Items.Add(username);
             messages.Add(message);
+            logger.Info("Info: Message added");
         }
 
         private void btnNewChat_Click(object sender, EventArgs e)
@@ -101,7 +102,7 @@ namespace ProjetoTS
                 FetchNewMessages();
             } catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                logger.Error(ex, "Error: " + ex.Message); //REVER
             }
         }
 

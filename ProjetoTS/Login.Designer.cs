@@ -52,7 +52,7 @@
             this.buttonLogin.TabIndex = 0;
             this.buttonLogin.Text = "LOGIN";
             this.buttonLogin.UseVisualStyleBackColor = true;
-            this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click);
+            this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click_1);
             // 
             // buttonRegister
             // 
@@ -69,7 +69,7 @@
             this.buttonRegister.TabIndex = 1;
             this.buttonRegister.Text = "REGISTER";
             this.buttonRegister.UseVisualStyleBackColor = false;
-            this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
+            this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click_1);
             // 
             // lblUsername
             // 
@@ -98,20 +98,20 @@
             // txtBoxUsername
             // 
             this.txtBoxUsername.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxUsername.Location = new System.Drawing.Point(105, 25);
+            this.txtBoxUsername.Location = new System.Drawing.Point(113, 25);
             this.txtBoxUsername.Margin = new System.Windows.Forms.Padding(4);
             this.txtBoxUsername.Name = "txtBoxUsername";
-            this.txtBoxUsername.Size = new System.Drawing.Size(369, 22);
+            this.txtBoxUsername.Size = new System.Drawing.Size(361, 22);
             this.txtBoxUsername.TabIndex = 4;
             // 
             // txtBoxPassword
             // 
             this.txtBoxPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxPassword.Location = new System.Drawing.Point(105, 65);
+            this.txtBoxPassword.Location = new System.Drawing.Point(110, 65);
             this.txtBoxPassword.Margin = new System.Windows.Forms.Padding(4);
             this.txtBoxPassword.Name = "txtBoxPassword";
             this.txtBoxPassword.PasswordChar = '*';
-            this.txtBoxPassword.Size = new System.Drawing.Size(369, 22);
+            this.txtBoxPassword.Size = new System.Drawing.Size(364, 22);
             this.txtBoxPassword.TabIndex = 5;
             // 
             // Login

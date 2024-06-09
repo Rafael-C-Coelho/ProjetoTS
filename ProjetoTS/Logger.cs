@@ -11,6 +11,7 @@ namespace Server
     {
         public string logFilePath { get; set; }
 
+        // Verifica se existe um directório.Caso não exista, cria-o.Este diretório servirá para armazenar o ficheiro de logs
         public Logger(string logFilename)
         {
             if (!Directory.Exists(Path.GetDirectoryName(GetPathString(logFilename))))
@@ -20,6 +21,8 @@ namespace Server
             this.logFilePath = GetPathString(logFilename);
         }
 
+        //o método recebe o nome do ficheiro e combina todo o caminho do diretório, bem como dos dois subdiretórios "ProjetoTS" e "Logs", e o nome do ficheiro log.
+        //Por fim,retorna o caminho completo do ficheiro  
         public static string GetPathString(string filename)
         {
             return Path.Combine(
@@ -30,6 +33,7 @@ namespace Server
             );
         }
 
+        //método que recebe a mensagem e o tipo de log, e acrescenta a data e hora no ficheiro do log 
         private void Log(string message, string type)
         {
             using (StreamWriter sw = new StreamWriter(logFilePath, true))
@@ -38,6 +42,7 @@ namespace Server
             }
         }
 
+        //métodos de logging que permitem efetuar o registo de diferentes tipos de eventos e informações que ocorrem durante a execução da aplicação 
         public void Debug(string message)
         {
             Log(message, "DEBUG");
@@ -53,7 +58,7 @@ namespace Server
             Log(message, "WARN");
         }
 
-        public void Error(string message)
+        public void Error(Exception ex, string message)
         {
             Log(message, "ERROR");
         }

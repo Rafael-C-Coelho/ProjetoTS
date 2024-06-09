@@ -2,17 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
+using System.Windows.Forms;
 
 namespace ProjetoTS
 {
     internal class DBHelper
     {
+        private Logger logger = new Logger("DBHelper.log");
         public DBHelper()
         {
             CreateDatabase();
         }
 
+        //caminho completo para a base de dados SQLite. O caminho inicia-se na  pasta 'ApplicationData' é o nome da pasta,
+        //seguindo para a subpasta 'Porjeto TS' e por fim o nome do ficheiro da base de dados 'client.sqlite'
         public static string GetConnectionString()
         {
             return Path.Combine(
@@ -20,10 +26,11 @@ namespace ProjetoTS
                 "ProjetoTS",
                 "client.sqlite"
             );
+
         }
 
         public static void CreateDatabase()
-        {
+        { //criação da base de dados com a inclusão das tabelas users e messages 
             string connectionString = GetConnectionString();
             if (!Directory.Exists(Path.GetDirectoryName(connectionString)))
             {
@@ -63,12 +70,14 @@ namespace ProjetoTS
                         catch (Exception e)
                         {
                             CreateDatabase();
+ 
                         }
                     }
                 }
             }
         }
 
+        //Inserir um novo registo de utilizador na base de dados e as respetivas chaves
         public void InsertUser(string username, string privateKey, string publicKey, string authToken)
         {
             try
@@ -88,14 +97,17 @@ namespace ProjetoTS
                         command.Parameters.AddWithValue("@publicKey", publicKey);
                         command.Parameters.AddWithValue("@authToken", authToken);
                         command.ExecuteNonQuery();
+                        logger.Info($"Info: User {username} has been successfully entered");
                     }
                 }
             } catch (Exception ex)
             {
-                // ADD LOGGER HERE @Rafael Coelho
+                MessageBox.Show("An error occurred while assigning the keys to the username");
+                logger.Error(ex,"Error: An error occurred while assigning the keys to the username");
             }
         }
 
+        //método para obter a chave privada de um utilizador específico através do seu username 
         public string GetPrivateKey(string username)
         {
             string privateKey = "";
@@ -105,6 +117,7 @@ namespace ProjetoTS
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
+                    logger.Info("Info: Starting to obtain the private key ");
                     command.CommandText = @"
                         SELECT `privateKey` FROM `users`
                         WHERE `username` = @username;
@@ -117,11 +130,14 @@ namespace ProjetoTS
                             privateKey = reader.GetString(0);
                         }
                     }
+                    logger.Info("Info: Private key successfully obtained.");
                 }
+
             }
             return privateKey;
         }
 
+        //método para obter a chave privada de um utilizador específico através do seu username 
         public string GetPublicKey(string username)
         {
             string publicKey = "";
@@ -144,10 +160,12 @@ namespace ProjetoTS
                         }
                     }
                 }
+                logger.Info("Info: Public key successfully obtained.");
             }
             return publicKey;
         }
 
+        // método responsável por atualizar o token de autenticação de um determinado utilizador na base de dados 
         public string GetAuthToken(string username)
         {
             string authToken = "";
@@ -169,11 +187,13 @@ namespace ProjetoTS
                             authToken = reader.GetString(0);
                         }
                     }
+                    logger.Info("Info: AuthToken successfully obtained");
                 }
             }
             return authToken;
         }
 
+        // método responsável por atualizar o token de autenticação de um determinado utilizador na base de dados 
         public void UpdateAuthToken(string username, string newAuthToken)
         {
             string connectionString = GetConnectionString();
@@ -191,9 +211,11 @@ namespace ProjetoTS
                     command.Parameters.AddWithValue("@username", username);
                     command.ExecuteNonQuery();
                 }
+                logger.Info("Info: AuthToken updated successfully");
             }
         }
 
+        // método que possibilita o armazenamento de mensagens na base de dados, mais especificamente na tabela "messages"
         public void InsertMessage(string sender, string recipient, string content)
         {
             try
@@ -213,13 +235,21 @@ namespace ProjetoTS
                         command.Parameters.AddWithValue("@content", content);
                         command.ExecuteNonQuery();
                     }
+
+                    MessageBox.Show("Message inserted successfully");
+                    logger.Info("Info: Message inserted successfully");
                 }
             } catch (Exception ex)
             {
-                // ADD LOGGER HERE @Rafael Coelho
+                  MessageBox.Show("An error occured while inserting a message");
+                  logger.Error(ex,"Error: An error occured while inserting a message");
+
             }
         }
 
+        //método que obtem a lista de mensagens de um utilizador.
+        //Para isso, é efetuada uma conexão com a base de dados, realizada uma consulta e selecionadas as mensagens,
+        //sendo apresentadas com o utilizador remetente, o conteúdo e a data/hora de envio 
         public List<string> GetMessages(string recipient)
         {
             List<string> messages = new List<string>();
@@ -241,6 +271,7 @@ namespace ProjetoTS
                             messages.Add($"{reader.GetString(0)}: {reader.GetString(1)} (Sent at: {reader.GetDateTime(2)})");
                         }
                     }
+                    logger.Info("Info: List of messages successfully obtained.");
                 }
             }
             return messages;
