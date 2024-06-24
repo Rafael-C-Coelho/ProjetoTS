@@ -165,7 +165,7 @@ namespace ProjetoTS
             return publicKey;
         }
 
-        // método responsável por atualizar o token de autenticação de um determinado utilizador na base de dados 
+        // método responsável por obter o token de autenticação de um determinado utilizador na base de dados 
         public string GetAuthToken(string username)
         {
             string authToken = "";

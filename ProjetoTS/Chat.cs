@@ -79,44 +79,44 @@ namespace ProjetoTS
 
         public override void OnReceive()
         {
-            Packet receivedPacket = AssembleReceivedDataIntoPacket();
+            Packet receivedPacket = AssembleReceivedDataIntoPacket(); //é construído um pacote a partir dos dados recebidos 
 
             if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_SUCCESS)
             {
-                string message = receivedPacket.GetDataAs<string>();
-                List<string> users = message.Split(',').ToList();
-                form.AddUsersToDropDown(users);
-                Disconnect();
+                string message = receivedPacket.GetDataAs<string>(); // extrai a mensagem do pacote enquanto string 
+                List<string> users = message.Split(',').ToList(); // string message é dividida em substrings sempre que uma vírgula (,) é encontrada 
+                form.AddUsersToDropDown(users); // adiciona esses utilizadores a um dropwdown no formulário
+                Disconnect(); //disconecta do servidor
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_ERROR)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_ERROR) // caso dê erro
             {
-                MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
-                form.Close();
-                Disconnect();
+                MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>())); //apresenta a mensagem de erro ao descriptografar 
+                form.Close(); //fecha o formulário 
+                Disconnect(); //disconecta do servidor 
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_SUCCESS)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_SUCCESS) // chave pública do utilizador final é recebida com sucesso
             {
-                ToUserPublicKey = Encoding.UTF8.GetString(DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
-                Packet packet = new Packet((int)ChatPacket.Type.SEND_MESSAGE);
-                packet.SetPayload(EncryptMessageWithAES(this.authtoken + ":" + form.GetUserTo() + ":" + Convert.ToBase64String(this.EncryptMessageWithPublicKey(form.GetMessage(), this.ToUserPublicKey))));
-                this.Send(Packet.Serialize(packet));
-                this.Receive();
-                this.Disconnect();
-            } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_ERROR)
+                ToUserPublicKey = Encoding.UTF8.GetString(DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>())); // desencripta  a chave pública do destinatário da msg
+                Packet packet = new Packet((int)ChatPacket.Type.SEND_MESSAGE); // cria pacote para enviar a mensagem 
+                packet.SetPayload(EncryptMessageWithAES(this.authtoken + ":" + form.GetUserTo() + ":" + Convert.ToBase64String(this.EncryptMessageWithPublicKey(form.GetMessage(), this.ToUserPublicKey)))); // define o payload do pacote e inclui o token de autenticação, o destinatário e a mensagem encriptografa
+                this.Send(Packet.Serialize(packet)); //envia o pacote
+                this.Receive(); // recebe a resposta em como foi recebido 
+                this.Disconnect(); //desconecta-se do servidor 
+            } else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_USER_PUBLIC_KEY_ERROR) // caso dê erro na obtenção da chave pública 
             {
-                MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
-                Disconnect();
+                MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>())); //exibe uma mensagem de erro quando tenta desencriptar a mensagem 
+                Disconnect(); //desconecta-se do servidor 
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE_SUCCESS)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE_SUCCESS) // envio da mensagem com sucesso 
             {
-                MessageBox.Show("Message sent successfully.");
-                form.Close();
-                Disconnect();
+                MessageBox.Show("Message sent successfully."); // exibe a mensagem 
+                form.Close(); //fecha o formulário 
+                Disconnect(); //desconecta-se do servidor 
             }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE_ERROR)
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.SEND_MESSAGE_ERROR) // caso dê erro no envio da mensagem
             {
-                MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
-                Disconnect();
+                MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>())); // exibe uma mensagem sobre um erro ao desencriptar o contéudo do pacote
+                Disconnect(); // desconecta-se do servidor 
             }
         }
     }

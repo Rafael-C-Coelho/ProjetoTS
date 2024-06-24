@@ -108,7 +108,7 @@ namespace Server
                     }
 
                     // Gerar o hash
-                    var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000);
+                    var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000); 
                     byte[] hash = pbkdf2.GetBytes(20);
 
                     // Combinar o salt e o hash para armazenamento
