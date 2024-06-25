@@ -92,8 +92,13 @@ namespace ProjetoTS
 
         private void destruirUtilizadorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
-        }
+			client = new InBoxClient(this, this.username);
+			Packet packet = new Packet((int)ChatPacket.Type.DELETE_USER);
+			packet.SetPayload(client.EncryptMessageWithAES(client.authtoken));
+			client.Send(Packet.Serialize(packet));
+			client.Receive();
+			client.Disconnect();
+		}
 
         private void timerFetchMessages_Tick(object sender, EventArgs e)
         {
@@ -102,7 +107,7 @@ namespace ProjetoTS
                 FetchNewMessages();
             } catch (Exception ex)
             {
-                logger.Error(ex, "Error: " + ex.Message); //REVER
+                logger.Exception(ex);
             }
         }
 
@@ -130,11 +135,20 @@ namespace ProjetoTS
     
         }
 
+		private void logoutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			client = new InBoxClient(this, this.username);
+			Packet packet = new Packet((int)ChatPacket.Type.LOGOUT);
+			packet.SetPayload(client.EncryptMessageWithAES(this.username + ":" + client.authtoken));
+			client.Send(Packet.Serialize(packet));
+			client.Receive();
+			client.Disconnect();
+		}
+	}
 
-    }
-
-    class InBoxClient : Client
+	class InBoxClient : Client
     {
+        private string username;
         private InBox form;
         private DBHelper dbhelper = new DBHelper();
 
@@ -142,6 +156,7 @@ namespace ProjetoTS
         {
             this.form = form;
             this.LoadClientKeys(username);
+            this.username = username;
             base.authtoken = dbhelper.GetAuthToken(username);
         }
 
@@ -155,6 +170,33 @@ namespace ProjetoTS
                 string message = Encoding.UTF8.GetString(data);
                 RSAParameters publicKey = DeserializePublicKey(message);
                 serverPublicKey = publicKey;
+                Disconnect();
+            }
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LOGOUT)
+            {
+                Login login = new Login();
+                login.Show();
+                MessageBox.Show("Logged out successfully.");
+                Disconnect();
+                this.form.Close();
+            }
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.DELETE_USER_ERROR)
+            {
+                MessageBox.Show("Error: " + receivedPacket.GetDataAs<string>());
+                Disconnect();
+				this.form.Close();
+			}
+            else if (receivedPacket._GetType() == (int)ChatPacket.Type.DELETE_USER_SUCCESS)
+            {
+                string messages = Encoding.UTF8.GetString(DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
+                if (messages == "")
+                {
+                    dbhelper.DeleteUser(this.username);
+                    MessageBox.Show("Succefully deleted");
+					Disconnect();
+					this.form.Close();
+					return;
+                }
                 Disconnect();
             }
             else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_MESSAGES_ERROR)
@@ -179,7 +221,8 @@ namespace ProjetoTS
                     this.form.AddMessage(username, messageContent);
                 }
                 Disconnect();
-            } else
+            }
+            else
             {
                 Disconnect(); return;
             }

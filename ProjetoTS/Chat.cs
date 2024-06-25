@@ -1,4 +1,5 @@
 ﻿using ProtoIP;
+using ProtoIP.Crypto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace ProjetoTS
 {
@@ -27,7 +29,7 @@ namespace ProjetoTS
 
         private void Chat_Load(object sender, EventArgs e)
         {
-            txtBoxUser.Text = Login.showUser;
+            txtBoxUser.Text = this.username;
             ChatClient client = new ChatClient(this, this.username);
             Packet packet = new Packet((int)ChatPacket.Type.LIST_USERS);
             packet.SetPayload(client.EncryptMessageWithAES(client.authtoken));
@@ -81,14 +83,14 @@ namespace ProjetoTS
         {
             Packet receivedPacket = AssembleReceivedDataIntoPacket();
 
-            if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_SUCCESS)
-            {
-                string message = receivedPacket.GetDataAs<string>();
-                List<string> users = message.Split(',').ToList();
-                form.AddUsersToDropDown(users);
-                Disconnect();
-            }
-            else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_ERROR)
+			if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_SUCCESS)
+			{
+				string message = receivedPacket.GetDataAs<string>();
+				List<string> users = message.Split(',').ToList();
+				form.AddUsersToDropDown(users);
+				Disconnect();
+			}
+			else if (receivedPacket._GetType() == (int)ChatPacket.Type.LIST_USERS_ERROR)
             {
                 MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
                 form.Close();
@@ -117,6 +119,9 @@ namespace ProjetoTS
             {
                 MessageBox.Show("Error: " + DecryptMessageWithAES(receivedPacket.GetDataAs<byte[]>()));
                 Disconnect();
+            } else
+            {
+                Disconnect(); return;
             }
         }
     }

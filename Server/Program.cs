@@ -333,7 +333,7 @@ namespace Server
                     Packet packet = new Packet((int)ChatPacket.Type.LOGOUT);
                     packet.SetPayload("Logout successful");
                     Send(Packet.Serialize(packet), userID);
-                    logger.Info("Loggout sucessfully");
+                    logger.Info("Logout sucessfully");
                 } catch (Exception e)
                 {
                     Packet packet = new Packet((int)ChatPacket.Type.LOGOUT);
