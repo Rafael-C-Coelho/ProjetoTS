@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -90,7 +91,47 @@ namespace Server
                 }
             }
         }
+
+        public void InsertUser(string username, string password, string publicKey)
+        {
+            string connectionString = GetConnectionString();
+            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    // Gerar um salt aleatório
+                    byte[] salt = new byte[16];
+                    using (var rng = new RNGCryptoServiceProvider())
+                    {
+                        rng.GetBytes(salt);
+                    }
+
+                    // Gerar o hash
+                    var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000); 
+                    byte[] hash = pbkdf2.GetBytes(20);
+
+                    // Combinar o salt e o hash para armazenamento
+                    byte[] hashBytes = new byte[36];
+                    Array.Copy(salt, 0, hashBytes, 0, 16);
+                    Array.Copy(hash, 0, hashBytes, 16, 20);
+                    string savedPasswordHash = Convert.ToBase64String(hashBytes);
+
+                    command.CommandText = @"
+                        INSERT INTO `users`(`username`, `password`, `public_key`)
+                        VALUES(@username, @password, @public_key);
+                    ";
+                    command.Parameters.AddWithValue("@username", username);
+                    command.Parameters.AddWithValue("@password", savedPasswordHash);
+                    command.Parameters.AddWithValue("@public_key", publicKey);
+                    command.ExecuteNonQuery();
+                }
+            }
+            logger.Info("Info: User data entered successfully");
+        }
+
         //introdução dos valores do utilizador na base de dados (username, password e chave pública)
+        /*
         public void InsertUser(string username, string password, string publicKey)
         {
             string connectionString = GetConnectionString();
@@ -111,6 +152,7 @@ namespace Server
             }
             logger.Info("Info:User data entered successfully");
         }
+        */
 
         //conexão e consulta da base de dados SQL lite para obtenção da chave pública que está associada ao nome do utilizador em questão e depois retorna essa chave 
         public string GetUserPublicKey(string username)
@@ -425,6 +467,7 @@ namespace Server
 
         // conexão à base de dados SQL Lite e uso do comando SQL para verificar se um utilizador se encontra registado com um determinado username e password na tabela users.
         // Como se trata de um bool, se o utilizador existir retronará verdadeiro, ou então falso se náo houver uma associação 
+        /*
         public bool CheckUser(string username, string password)
         {
             bool exists = false;
@@ -435,6 +478,23 @@ namespace Server
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
+                    // Gerar um salt aleatório
+                    byte[] salt = new byte[16];
+                    using (var rng = new RNGCryptoServiceProvider())
+                    {
+                        rng.GetBytes(salt);
+                    }
+
+                    // Gerar o hash
+                    var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000);
+                    byte[] hash = pbkdf2.GetBytes(20);
+
+                    // Combinar o salt e o hash para armazenamento
+                    byte[] hashBytes = new byte[36];
+                    Array.Copy(salt, 0, hashBytes, 0, 16);
+                    Array.Copy(hash, 0, hashBytes, 16, 20);
+                    string savedPasswordHash = Convert.ToBase64String(hashBytes);
+
                     command.CommandText = @"
                         SELECT `id` FROM `users`
                         WHERE `username` = @username AND `password` = @password;
@@ -451,6 +511,56 @@ namespace Server
 
                     logger.Info("Info: User verification has finished");
                 }
+            }
+
+            return exists;
+        }
+        */
+
+        public bool CheckUser(string username, string password)
+        {
+            bool exists = false;
+            string connectionString = GetConnectionString();
+            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            {
+                logger.Info("Info: User verification has started");
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
+                SELECT `password` FROM `users`
+                WHERE `username` = @username;
+            ";
+                    command.Parameters.AddWithValue("@username", username);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            // Recupera o hash armazenado
+                            string savedPasswordHash = reader.GetString(0);
+
+                            // Extrai o salt e o hash armazenados
+                            byte[] hashBytes = Convert.FromBase64String(savedPasswordHash);
+                            byte[] salt = new byte[16];
+                            Array.Copy(hashBytes, 0, salt, 0, 16);
+
+                            // Gera o hash com a senha fornecida e o salt armazenado
+                            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000);
+                            byte[] hash = pbkdf2.GetBytes(20);
+
+                            // Compara o hash gerado com o hash armazenado
+                            for (int i = 0; i < 20; i++)
+                            {
+                                if (hashBytes[i + 16] != hash[i])
+                                {
+                                    return false;
+                                }
+                            }
+                            exists = true;
+                        }
+                    }
+                }
+                logger.Info("Info: User verification has finished");
             }
 
             return exists;

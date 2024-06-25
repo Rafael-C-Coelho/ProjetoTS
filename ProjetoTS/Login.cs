@@ -97,7 +97,7 @@ namespace ProjetoTS
 
             usernameRegister = txtBoxUsername.Text;
             LoginClient client = new LoginClient(this); //criação do cliente para login 
-            Packet packet = new Packet((int)ChatPacket.Type.REGISTER);
+            Packet packet = new Packet((int)ChatPacket.Type.REGISTER); // criação do pacote que contem os dados do registo
             client.CreateClientKeys(txtBoxUsername.Text); //criação das chaves criptografadas
             packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text + ":" + client.clientPublicKeyString));// criação e envio de um pacote com informações criptografadas (nome de utilizador, senha e chave pública) para o servidor
             client.Send(Packet.Serialize(packet));
@@ -108,7 +108,7 @@ namespace ProjetoTS
         private void buttonLogin_Click_1(object sender, EventArgs e)
         {
             showUser = txtBoxUsername.Text; //permite que o nome do utilizador apareça no form InBox e Chat 
-            LoginClient client = new LoginClient(this); //instanciação neecssária para a comunicação com o servidor 
+            LoginClient client = new LoginClient(this); //instanciação necessária para a comunicação com o servidor 
             Packet packet = new Packet((int)ChatPacket.Type.LOGIN); //criação do pacote de dados para o Login 
             packet.SetPayload(client.EncryptMessageWithAES(txtBoxUsername.Text + ":" + txtBoxPassword.Text)); //mensagem criptografada a enviar para o servidor, sob a forma de pacote
             client.Send(Packet.Serialize(packet)); //serialização do pacote e envio para o servidor 

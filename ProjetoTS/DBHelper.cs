@@ -164,17 +164,17 @@ namespace ProjetoTS
 			return publicKey;
 		}
 
-		// método responsável por atualizar o token de autenticação de um determinado utilizador na base de dados 
-		public string GetAuthToken(string username)
-		{
-			string authToken = "";
-			string connectionString = GetConnectionString();
-			using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
-			{
-				connection.Open();
-				using (SQLiteCommand command = new SQLiteCommand(connection))
-				{
-					command.CommandText = @"
+        // método responsável por obter o token de autenticação de um determinado utilizador na base de dados 
+        public string GetAuthToken(string username)
+        {
+            string authToken = "";
+            string connectionString = GetConnectionString();
+            using (SQLiteConnection connection = new SQLiteConnection($"Data Source={connectionString};Version=3;"))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = @"
                         SELECT `authToken` FROM `users`
                         WHERE `username` = @username;
                     ";
